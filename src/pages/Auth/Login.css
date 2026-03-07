@@ -1,0 +1,226 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --stitch-bg: #0f1115;
+    --stitch-card: #181b21;
+    --stitch-accent: #46ec13;
+    --stitch-text: #ffffff;
+    --stitch-text-muted: #9ba1ad;
+    --stitch-border: rgba(255, 255, 255, 0.08);
+}
+
+.login-auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    background-color: var(--stitch-bg);
+    font-family: 'Manrope', sans-serif;
+    color: var(--stitch-text);
+}
+
+/* Left Side - Visual/Branding */
+.auth-side-branding {
+    flex: 1.2;
+    background: linear-gradient(135deg, rgba(15, 17, 21, 0.92), rgba(15, 17, 21, 0.6)),
+        url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&q=80&w=2000');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px;
+    overflow: hidden;
+}
+
+@media (max-width: 968px) {
+    .auth-side-branding {
+        display: none;
+    }
+}
+
+.branding-content {
+    position: relative;
+    z-index: 2;
+    max-width: 500px;
+}
+
+.branding-content h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    background: linear-gradient(to bottom right, #ffffff, #9ba1ad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+    /* Thêm bóng đổ để chữ nổi bật */
+}
+
+.branding-content p {
+    font-size: 1.25rem;
+    color: #e0e6ed;
+    /* Màu chữ sáng hơn một chút */
+    line-height: 1.6;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    /* Đổ bóng cho văn bản */
+}
+
+.stitch-logo-indicator {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--stitch-accent);
+}
+
+/* Right Side - Form */
+.auth-side-form {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background-color: var(--stitch-bg);
+    border-left: 1px solid var(--stitch-border);
+}
+
+.form-container-stitch {
+    width: 100%;
+    max-width: 420px;
+}
+
+.form-header {
+    margin-bottom: 32px;
+}
+
+.form-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.form-header p {
+    color: var(--stitch-text-muted);
+}
+
+/* Social Buttons */
+.social-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.social-stitch-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px;
+    background-color: var(--stitch-card);
+    border: 1px solid var(--stitch-border);
+    border-radius: 100px;
+    /* ROUND_FULL as requested */
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.social-stitch-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.social-stitch-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    margin: 24px 0;
+    color: var(--stitch-text-muted);
+    font-size: 0.85rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--stitch-border);
+}
+
+.auth-divider span {
+    padding: 0 16px;
+}
+
+/* Form Inputs */
+.stitch-form-group {
+    margin-bottom: 20px;
+}
+
+.stitch-form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--stitch-text-muted);
+}
+
+.stitch-input {
+    width: 100%;
+    padding: 14px 16px;
+    background-color: var(--stitch-card);
+    border: 1px solid var(--stitch-border);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.stitch-input:focus {
+    border-color: var(--stitch-accent);
+    background-color: rgba(70, 236, 19, 0.02);
+}
+
+.stitch-submit-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--stitch-accent);
+    color: #000;
+    border: none;
+    border-radius: 100px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 0.2s;
+}
+
+.stitch-submit-btn:hover {
+    filter: brightness(1.1);
+    transform: scale(1.01);
+}
+
+.auth-footer {
+    margin-top: 32px;
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--stitch-text-muted);
+}
+
+.auth-footer a {
+    color: var(--stitch-accent);
+    text-decoration: none;
+    font-weight: 600;
+}
