@@ -12,8 +12,12 @@
 }
 
 .header.scrolled {
-    height: 60px;
-    box-shadow: var(--shadow);
+    height: 70px;
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(15px) saturate(180%);
+    -webkit-backdrop-filter: blur(15px) saturate(180%);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .header-container {
@@ -31,8 +35,12 @@
     gap: 10px;
 }
 
-.logo-icon {
-    font-size: 1.8rem;
+.header-logo-img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .logo-text {
@@ -110,6 +118,11 @@
 
 .search-btn {
     background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .action-btn {

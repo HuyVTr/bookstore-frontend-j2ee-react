@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import api from '../../services/api';
 import './Home.css';
+import parallaxBg from '../../assets/home_banner/parallax_sale_banner.png'; // Anthony đã cập nhật tên file chuẩn của bạn!
 
 const Home = () => {
     const [books, setBooks] = useState([]);
@@ -15,14 +16,136 @@ const Home = () => {
     const [activeTab, setActiveTab] = useState('featured');
     const [featuredBooks, setFeaturedBooks] = useState([]);
     const [featuredLoading, setFeaturedLoading] = useState(false);
+    const [visibleSections, setVisibleSections] = useState({});
+    const [selectedMood, setSelectedMood] = useState('all');
+    const [quickViewBook, setQuickViewBook] = useState(null);
+    const parallaxBgRef = useRef(null); // Sử dụng Ref để thao tác trực tiếp với DOM
+
+    // Refs for scroll reveal
+    // Mood slider states
+    const [moodIndex, setMoodIndex] = useState(0);
+    const [isMoodDragging, setIsMoodDragging] = useState(false);
+    const [moodStartX, setMoodStartX] = useState(0);
+    const [isMoodTransitioning, setIsMoodTransitioning] = useState(true);
+
+    const moodTrackRef = useRef(null);
+    const moodDragOffsetRef = useRef(0);
+
+    const handleMoodStart = (e) => {
+        setIsMoodDragging(true);
+        setMoodStartX(e.touches ? e.touches[0].pageX : e.pageX);
+        setIsMoodTransitioning(false);
+    };
+
+    const handleMoodMove = (e) => {
+        if (!isMoodDragging) return;
+        const currentX = e.touches ? e.touches[0].pageX : e.pageX;
+        const walk = currentX - moodStartX;
+        moodDragOffsetRef.current = walk;
+        
+        if (moodTrackRef.current) {
+            moodTrackRef.current.style.setProperty('--mood-drag-offset', `${walk}px`);
+        }
+    };
+
+    const handleMoodEnd = () => {
+        setIsMoodDragging(false);
+        setIsMoodTransitioning(true);
+        const threshold = 50;
+        
+        if (moodDragOffsetRef.current > threshold && moodIndex > 0) {
+            setMoodIndex(prev => prev - 1);
+        } else if (moodDragOffsetRef.current < -threshold && moodIndex < Math.max(0, books.slice(0, 8).length - 3)) {
+            setMoodIndex(prev => prev + 1);
+        }
+        
+        moodDragOffsetRef.current = 0;
+        if (moodTrackRef.current) {
+            moodTrackRef.current.style.setProperty('--mood-drag-offset', '0px');
+        }
+    };
+
+    const moodTrackStyle = {
+        transform: `translateX(calc(-${moodIndex} * (var(--mood-card-width) + 20px) + var(--mood-drag-offset, 0px)))`,
+        transition: isMoodTransitioning ? 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1)' : 'none',
+    };
+
+    const sectionRefs = {
+        categories: React.useRef(null),
+        featured: React.useRef(null),
+        authors: React.useRef(null),
+        newest: React.useRef(null),
+        testimonials: React.useRef(null),
+        newsletter: React.useRef(null),
+        parallax: React.useRef(null)
+    };
+
+    const testimonials = [
+        { name: "Minh Tuấn", role: "Mọt sách chính hiệu", comment: "Sách giao cực nhanh, đóng gói cẩn thận. Tôi rất hài lòng với trải nghiệm mua sắm tại đây!" },
+        { name: "Hoàng Yến", role: "Sinh viên", comment: "Hệ thống gợi ý sách rất thông minh, giúp mình tìm được đúng những tài liệu cần thiết cho đồ án." },
+        { name: "Quốc Bảo", role: "Tác giả trẻ", comment: "Giao diện website cực kỳ hiện đại và tinh tế. Đây là nơi lý tưởng để lan tỏa tri thức." }
+    ];
+
+    useEffect(() => {
+        if (loading) return;
+
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const handleIntersect = (entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const sectionId = entry.target.getAttribute('data-section');
+                    setVisibleSections(prev => ({ ...prev, [sectionId]: true }));
+                }
+            });
+        };
+
+        const observer = new IntersectionObserver(handleIntersect, observerOptions);
+
+        Object.values(sectionRefs).forEach(ref => {
+            if (ref.current) observer.observe(ref.current);
+        });
+
+        return () => observer.disconnect();
+    }, [loading]);
+
+    // Anthony cấu hình lại Parallax tối ưu hiệu năng
+    useEffect(() => {
+        const handleParallax = () => {
+            if (sectionRefs.parallax.current && parallaxBgRef.current) {
+                const rect = sectionRefs.parallax.current.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+
+                if (rect.top < windowHeight && rect.bottom > 0) {
+                    const scrollFraction = (windowHeight - rect.top) / (windowHeight + rect.height);
+
+                    // Tăng biên độ di chuyển lển 40% để hiệu ứng rõ rệt hơn
+                    const travelRange = rect.height * 0.4;
+                    const yPos = -(scrollFraction * travelRange);
+
+                    // Thao tác trực tiếp với DOM để đạt 60fps, không làm React phải render lại toàn bộ trang
+                    parallaxBgRef.current.style.transform = `translateY(${yPos}px)`;
+                }
+            }
+        };
+
+        window.addEventListener('scroll', handleParallax, { passive: true });
+        return () => window.removeEventListener('scroll', handleParallax);
+    }, []);
 
     // Thực thi Drag to Scroll + Vòng lặp
     const numClones = 2; // Nhân bản 2 thẻ ảo 2 đầu để bù đắp tràn viền an toàn
     const [currentIndex, setCurrentIndex] = useState(numClones);
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
-    const [dragOffset, setDragOffset] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(true);
+
+    // Performance Optimization: Use Ref for drag offset to avoid re-rendering entire Home component
+    const trackRef = useRef(null);
+    const dragOffsetRef = useRef(0);
 
     const handleTouchStart = (e) => {
         setIsDragging(true);
@@ -38,19 +161,29 @@ const Home = () => {
         if (!isDragging) return;
         const currentX = e.touches ? e.touches[0].pageX : e.pageX;
         const walk = currentX - startX;
-        setDragOffset(walk);
+        dragOffsetRef.current = walk;
+
+        // Update CSS variable directly via DOM for 60fps performance
+        if (trackRef.current) {
+            trackRef.current.style.setProperty('--drag-offset', `${walk}px`);
+        }
     };
 
     const handleDragEnd = () => {
         setIsDragging(false);
-        setIsTransitioning(true); // Bật lại hiệu ứng khi thả
+        setIsTransitioning(true);
 
-        if (dragOffset > 50) { // Kéo sang phải => Prev
+        if (dragOffsetRef.current > 50) {
             setCurrentIndex(prev => prev - 1);
-        } else if (dragOffset < -50) { // Kéo sang trái => Next
+        } else if (dragOffsetRef.current < -50) {
             setCurrentIndex(prev => prev + 1);
         }
-        setDragOffset(0);
+
+        // Reset drag offset
+        dragOffsetRef.current = 0;
+        if (trackRef.current) {
+            trackRef.current.style.setProperty('--drag-offset', `0px`);
+        }
     };
 
     // Vòng lặp tĩnh ngầm (Reset Infinite Loop không có Transition sau 0.5s)
@@ -76,18 +209,17 @@ const Home = () => {
     }, [currentIndex, featuredBooks.length]);
 
     const trackStyle = {
-        transform: `translateX(calc(var(--actual-card-width) / -2 - ${currentIndex} * (var(--actual-card-width) + var(--card-gap)) + ${dragOffset}px))`,
+        transform: `translateX(calc(var(--actual-card-width) / -2 - ${currentIndex} * (var(--actual-card-width) + var(--card-gap)) + var(--drag-offset, 0px)))`,
         transition: isTransitioning ? 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1)' : 'none',
     };
 
     // Hàm tạo mảng có 2 clones mỗi đầu 
-    const getExtendedBooks = () => {
+    const extendedBooks = React.useMemo(() => {
         if (featuredBooks.length === 0) return [];
         const books = featuredBooks;
         const n = books.length;
-        if (n === 1) return [{ ...books[0], _loopId: 'real-0' }]; // Nếu chỉ có 1 sách khỏi loop ảo
+        if (n === 1) return [{ ...books[0], _loopId: 'real-0' }];
 
-        // Lấy 2 cuốn cuối ném lên đầu, 2 cuốn đầu ném về cuối vòng
         const cloneBefore2 = books[(n - 2 % n + n) % n];
         const cloneBefore1 = books[(n - 1 % n + n) % n];
         const cloneAfter1 = books[0];
@@ -100,36 +232,36 @@ const Home = () => {
             { ...cloneAfter1, _loopId: 'clone-a1' },
             { ...cloneAfter2, _loopId: 'clone-a2' }
         ];
-    };
-    const extendedBooks = getExtendedBooks();
+    }, [featuredBooks]);
 
-    // Hiển thị ảnh tác giả: Ưu tiên ảnh từ DB, nếu không có mới dùng Unsplash
-    const getAuthorImg = (author, index) => {
-        if (author?.authorImage && author.authorImage.startsWith('http')) {
-            return author.authorImage;
+    // Hiển thị ảnh tác giả: Ưu tiên ảnh từ DB, nếu không có mới dùng 2D Illustrations
+    const getAuthorImg = (authorData, index) => {
+        // authorData có thể là object { authorName, authorImage } hoặc chỉ là string (tên)
+        const name = typeof authorData === 'string' ? authorData : authorData?.authorName;
+        const img = typeof authorData === 'object' ? authorData?.authorImage : null;
+
+        // Nếu có ảnh thật (từ DB hoặc Link tuyệt đối)
+        if (img && img.startsWith('http')) {
+            return img;
         }
 
-        const placeholders = [
-            'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80',
-            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
-            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80',
-            'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=150&q=80',
-            'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80'
-        ];
-        return placeholders[index % placeholders.length];
+        // Nếu không có ảnh, dùng DiceBear API để tạo avatar 2D nghệ thuật và ổn định dựa trên tên
+        // Sử dụng style 'avataaars' hoặc 'adventurer' để có giao diện 2D cao cấp
+        const seed = name || `author-${index}`;
+        return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
     };
 
     useEffect(() => {
         const fetchHomeData = async () => {
             try {
                 const [booksRes, bestSellerRes, categoriesRes, authorsRes] = await Promise.all([
-                    api.get('public/books').catch(err => ({ data: { books: [] } })),
+                    api.get('public/books/newest').catch(err => ({ data: [] })),
                     api.get('public/books/best-seller').catch(err => ({ data: null })),
                     api.get('public/categories/top-selling').catch(err => ({ data: [] })),
                     api.get('public/authors/top-selling?limit=5').catch(err => ({ data: [] }))
                 ]);
 
-                setBooks(booksRes.data?.books || []);
+                setBooks(booksRes.data || []);
                 setBestSeller(bestSellerRes.data);
                 setTopCategories(categoriesRes.data || []);
                 setTopAuthors(authorsRes.data || []);
@@ -159,7 +291,10 @@ const Home = () => {
                     setCurrentIndex(0);
                 }
                 setIsTransitioning(false);
-                setDragOffset(0);
+                dragOffsetRef.current = 0;
+                if (trackRef.current) {
+                    trackRef.current.style.setProperty('--drag-offset', '0px');
+                }
             } catch (error) {
                 console.error("Error fetching featured:", error);
                 setFeaturedBooks([]);
@@ -198,7 +333,7 @@ const Home = () => {
     const nextPage = () => { if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1); };
     const prevPage = () => { if (currentPage > 0) setCurrentPage(currentPage - 1); };
 
-    if (loading) return <div className="loading">Đang tải dữ liệu...</div>;
+    if (loading) return <div className="loading">Đang tải dữ liệu…</div>;
 
     const getBookImg = (path) => path ? `http://localhost:8080/images/${path.split('/').pop()}` : 'https://via.placeholder.com/200x300?text=No+Cover';
 
@@ -214,7 +349,7 @@ const Home = () => {
                 <div className="hero-content">
                     <div className="hero-text">
                         <span className="hero-subtitle">Kiến tạo tương lai cùng tri thức</span>
-                        <h1 className="hero-title">Khơi nguồn <br /><span className="text-gradient">Cảm hứng đọc</span></h1>
+                        <h1 className="hero-title text-balance">Khơi nguồn <br /><span className="text-gradient">Cảm hứng đọc</span></h1>
                         <p className="hero-description">Hệ thống quản lý sách thông minh giúp bạn tìm thấy tri thức nhanh nhất, chính xác nhất.</p>
                         <div className="hero-btns">
                             <button className="cta-button primary magnetic-btn">Bắt đầu ngay →</button>
@@ -228,7 +363,14 @@ const Home = () => {
                     </div>
                     <div className="hero-bento-grid">
                         <div className="bento-item main-image glass">
-                            <img src={getBookImg(bestSeller?.imagePath)} alt="" className="hero-main-img" />
+                            <img
+                                src={getBookImg(bestSeller?.imagePath)}
+                                alt={bestSeller?.title || "Sách nổi bật"}
+                                className="hero-main-img"
+                                width="400"
+                                height="600"
+                                fetchpriority="high"
+                            />
                             <div className="status-badge">Best Seller</div>
                             <div className="bento-overlay"><h4>{bestSeller?.title || "Sách nổi bật"}</h4><p>{bestSeller?.author}</p></div>
                         </div>
@@ -238,8 +380,15 @@ const Home = () => {
                 </div>
             </section>
 
+
+
+
             {/* 2. Featured Books Tab Section */}
-            <section className="featured-books-section">
+            <section
+                ref={sectionRefs.featured}
+                data-section="featured"
+                className={`featured-books-section reveal-on-scroll ${visibleSections.featured ? 'visible' : ''}`}
+            >
                 <div className="featured-main-container">
                     <div className="section-header-centered">
                         <span className="section-subtitle-small">BỘ SƯU TẬP ĐẶC BIỆT</span>
@@ -258,6 +407,7 @@ const Home = () => {
                             <div className="featured-slider-container">
                                 <div className="slider-offset">
                                     <div
+                                        ref={trackRef}
                                         className={`featured-spotlight-track-new ${isDragging ? 'dragging' : ''}`}
                                         style={trackStyle}
                                         onMouseDown={handleTouchStart}
@@ -272,7 +422,16 @@ const Home = () => {
                                             <div className={`spotlight-card-new ${idx === currentIndex ? 'active-slide' : ''}`} key={book._loopId}>
                                                 <div className="spotlight-img-column">
                                                     <div className="img-container-new">
-                                                        <img src={getBookImg(book.imagePath)} alt={book.title} />
+                                                        <img
+                                                            src={getBookImg(book.imagePath)}
+                                                            alt={book.title}
+                                                            width="300"
+                                                            height="450"
+                                                        />
+                                                        {/* Badge Nguồn gốc */}
+                                                        <div className={`source-badge ${book.bookSource?.toLowerCase()}`}>
+                                                            {book.bookSource === 'OFFICIAL' ? '🏛️ Official' : '✍️ Author'}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="spotlight-content-column">
@@ -286,25 +445,28 @@ const Home = () => {
                                                     <h4 className="book-title-new">{book.title}</h4>
                                                     <div className="author-row-new">
                                                         <div className="author-avatar-new">
-                                                            <img src={`https://ui-avatars.com/api/?name=${book.author}&background=random&color=fff`} alt={book.author} />
+                                                            <img
+                                                                src={getAuthorImg(topAuthors.find(a => a.authorName === book.author) || book.author, idx)}
+                                                                alt={book.author}
+                                                            />
                                                         </div>
                                                         <span className="author-name-new">{book.author}</span>
                                                     </div>
-                                                    <div className="price-row-new">
+                                                    <div className="price-row-new tabular-nums">
                                                         <span className="price-current-new">
                                                             {book.isOnSale ? book.discountPrice?.toLocaleString() : book.price?.toLocaleString()} VNĐ
                                                         </span>
                                                         {book.isOnSale && <span className="price-old-new">{book.price?.toLocaleString()} VNĐ</span>}
                                                     </div>
                                                     <div className="stock-container-new">
-                                                        <div className="stock-progress-bar-new">
-                                                            <div className="progress-fill-new" style={{ width: `${Math.min((book.quantity || 0) * 2, 100)}%` }}></div>
-                                                        </div>
-                                                        <span className="stock-text-new">{book.quantity || 0} Books In Stock</span>
+                                                        <span className="stock-text-new tabular-nums">{book.quantity || 0} Books In Stock</span>
                                                     </div>
-                                                    <button className="cart-btn-round-new" title="Thêm vào giỏ hàng">
-                                                        <span className="cart-icon-new">🛒</span>
-                                                    </button>
+                                                    <div className="spotlight-actions-new">
+                                                        <button className="q-view-btn-spotlight" onClick={() => setQuickViewBook(book)}>QUICK VIEW</button>
+                                                        <button className="cart-btn-round-new" aria-label={`Thêm ${book.title} vào giỏ hàng`} title="Thêm vào giỏ hàng">
+                                                            <span className="cart-icon-new">🛒</span>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         ))}
@@ -334,18 +496,44 @@ const Home = () => {
                     ) : (
                         <div className="no-data">Không có dữ liệu cho mục này</div>
                     )}
+                    <div className="view-all-wrapper">
+                        <button className="view-all-btn">Xem Tất Cả <span className="arrow">→</span></button>
+                    </div>
+                </div>
+            </section>
+
+            {/* 2.5. Special Promotional Split Section (Bookly Style) */}
+            <section className="special-offer-section edge-to-edge">
+                <div className="offer-split-container">
+                    <div className="offer-image-side">
+                        <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=1000" alt="Special Collection" />
+                        <div className="offer-badge-floating">GIẢM 40%</div>
+                    </div>
+                    <div className="offer-content-side">
+                        <span className="offer-tag">BỘ SƯU TẬP MÙA THU</span>
+                        <h2 className="offer-heading">Đánh thức <br /><span>Tâm hồn Văn chương</span></h2>
+                        <p className="offer-desc">Khám phá những tác phẩm kinh điển được tuyển chọn kỹ lưỡng, mang lại góc nhìn mới về cuộc sống và con người. Ưu đãi kéo dài đến hết tháng 3.</p>
+                        <div className="offer-actions">
+                            <button className="offer-btn-primary">KHÁM PHÁ NGAY</button>
+                            <button className="offer-btn-secondary">TÌM HIỂU THÊM</button>
+                        </div>
+                    </div>
                 </div>
             </section>
 
             {/* 3. Categories Section */}
-            <section className="categories-section">
+            <section
+                ref={sectionRefs.categories}
+                data-section="categories"
+                className={`categories-section reveal-on-scroll ${visibleSections.categories ? 'visible' : ''}`}
+            >
                 <div className="section-container">
                     <div className="section-header-centered">
                         <span className="section-subtitle-small">KHÁM PHÁ NGAY</span>
                         <h2 className="section-title-large">Thể Loại Phổ Biến</h2>
                     </div>
                     <div className="categories-grid">
-                        {topCategories.map((item, index) => (
+                        {topCategories.length > 0 ? topCategories.map((item, index) => (
                             <div key={index} className={`category-card ${getCategoryClass(item.category.name)}`}>
                                 <div className="category-icon-bg">{getCategoryIcon(item.category)}</div>
                                 <div className="category-overlay">
@@ -354,54 +542,302 @@ const Home = () => {
                                     <p>{item.totalSold}+ lượt mua</p>
                                 </div>
                             </div>
-                        ))}
+                        )) : (
+                            <div className="no-data-simple">Chưa có danh mục nổi bật</div>
+                        )}
                     </div>
                 </div>
             </section >
 
+            {/* 3.5. Mood-Based Discovery */}
+            <section className="mood-discovery-section section-container">
+                <div className="section-header-centered">
+                    <span className="section-subtitle-small">HÔM NAY BẠN ĐỌC GÌ?</span>
+                    <h2 className="section-title-large">Khám phá theo tâm trạng</h2>
+                    <div className="mood-selectors">
+                        {['all', 'Cần động lực', 'Để thư giãn', 'Muốn suy ngẫm', 'Yêu lãng mạn'].map(mood => (
+                            <button
+                                key={mood}
+                                className={`mood-btn ${selectedMood === mood ? 'active' : ''}`}
+                                onClick={() => setSelectedMood(mood)}
+                            >
+                                {mood === 'all' ? 'Tất cả' : mood}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                <div className="mood-books-grid">
+                    <div className="mood-slider-window">
+                        <div
+                            ref={moodTrackRef}
+                            className={`mood-track ${isMoodDragging ? 'dragging' : ''}`}
+                            style={moodTrackStyle}
+                            onMouseDown={handleMoodStart}
+                            onMouseMove={handleMoodMove}
+                            onMouseUp={handleMoodEnd}
+                            onMouseLeave={() => isMoodDragging && handleMoodEnd()}
+                            onTouchStart={handleMoodStart}
+                            onTouchMove={handleMoodMove}
+                            onTouchEnd={handleMoodEnd}
+                        >
+                            {books.slice(0, 8).map((book, idx) => (
+                                <div key={book.id} className="mood-book-card">
+                                    <div className="m-card-top">
+                                        <div className="m-book-img">
+                                            <img src={getBookImg(book.imagePath)} alt={book.title} />
+                                            <div className="m-badges">
+                                                {idx % 2 === 0 && <span className="m-badge-hot">Hot</span>}
+                                                {book.isOnSale && <span className="m-badge-sale">-{Math.round((1 - book.discountPrice / book.price) * 100)}%</span>}
+                                            </div>
+                                            <div className="m-overlay-actions">
+                                                <button className="q-view-btn-small" onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setQuickViewBook(book);
+                                                }}>QUICK VIEW</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="m-card-body">
+                                        <span className="m-category-name">Thiết Kế & Nghệ Thuật</span>
+                                        <h5 className="m-title">{book.title}</h5>
+                                        <div className="m-pricing-row">
+                                            <span className="m-current-price">{book.isOnSale ? book.discountPrice?.toLocaleString() : book.price?.toLocaleString()}đ</span>
+                                            {book.isOnSale && <span className="m-old-price">{book.price?.toLocaleString()}đ</span>}
+                                        </div>
+                                        <div className="m-author-rating-row">
+                                            <div className="m-author-info">
+                                                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${book.author}`} alt={book.author} />
+                                                <span>{book.author}</span>
+                                            </div>
+                                            <div className="m-stars">
+                                                {['★', '★', '★', '★', '☆'].map((s, i) => <span key={i} className={s === '★' ? 'star-fill' : 'star-empty'}>{s}</span>)}
+                                            </div>
+                                        </div>
+                                        <button className="m-add-cart-btn">Add To Cart</button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Mood Promo Banner - Kept separate as requested */}
+                    <div className="mood-promo-banner">
+                        <div className="promo-text-content">
+                            <h3>Find Your <br />Nest Books!</h3>
+                            <p>Get Your 25% Discount Now!</p>
+                            <button className="promo-shop-btn">Shop Now <span className="arrow">→</span></button>
+                        </div>
+                        <div className="promo-image-wrapper">
+                            <img src="/artifacts/mood_promo_girl_banner_1773223446542.png" alt="Promo" />
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* 4. Sách Mới Section */}
-            < section className="books-section" >
+            <section
+                ref={sectionRefs.newest}
+                data-section="newest"
+                className={`books-section reveal-on-scroll ${visibleSections.newest ? 'visible' : ''}`}
+            >
                 <div className="section-container">
                     <div className="section-header-centered">
                         <span className="section-subtitle-small">SẢN PHẨM CHẤT LƯỢNG</span>
                         <h2 className="section-title-large">Sách Mới Phát Hành</h2>
                     </div>
                     <div className="books-carousel-wrapper">
-                        <button className={`nav-button prev ${currentPage === 0 ? 'disabled' : ''}`} onClick={prevPage}>←</button>
+                        <button className={`nav-button prev ${currentPage === 0 ? 'disabled' : ''}`} onClick={prevPage}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+                        </button>
                         <div className="book-carousel-window">
                             <div className="book-carousel-track" style={{ transform: `translateX(-${currentPage * 100}%)` }}>
-                                {books.map((book) => (
+                                {books.length > 0 ? books.map((book) => (
                                     <div key={book.id} className="book-card-item-wrapper">
                                         <div className="book-card-alt">
                                             <div className="book-image-container">
-                                                <img className="main-book-cover" src={getBookImg(book.imagePath)} alt={book.title} />
-                                                <div className="add-to-cart-overlay"><button>THÊM VÀO GIỎ</button></div>
+                                                <img
+                                                    className="main-book-cover"
+                                                    src={getBookImg(book.imagePath)}
+                                                    alt={book.title}
+                                                    loading="lazy"
+                                                    width="200"
+                                                    height="300"
+                                                />
+                                                <div className={`source-badge ${book.bookSource?.toLowerCase()}`}>
+                                                    {book.bookSource === 'OFFICIAL' ? '🏛️ Official' : '✍️ Author'}
+                                                </div>
+                                                <div className="add-to-cart-overlay">
+                                                    <button className="q-view-btn" onClick={() => setQuickViewBook(book)}>QUICK VIEW</button>
+                                                    <button>THÊM VÀO GIỎ</button>
+                                                </div>
                                             </div>
-                                            <div className="book-info-centered"><h3>{book.title}</h3><p className="author">{book.author}</p><p className="price">{book.price?.toLocaleString()} VNĐ</p></div>
+                                            <div className="book-info-centered">
+                                                <h3>{book.title}</h3>
+                                                <p className="author">{book.author}</p>
+                                                <p className="price">{book.price?.toLocaleString()} VNĐ</p>
+                                            </div>
                                         </div>
                                     </div>
-                                ))}
+                                )) : (
+                                    <div className="no-data-carousel">Hiện tại chưa có sách mới phát hành</div>
+                                )}
                             </div>
                         </div>
-                        <button className={`nav-button next ${currentPage === totalPages - 1 ? 'disabled' : ''}`} onClick={nextPage}>→</button>
+                        <button className={`nav-button next ${currentPage === totalPages - 1 ? 'disabled' : ''}`} onClick={nextPage}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
+                        </button>
+                    </div>
+                    <div className="view-all-wrapper">
+                        <button className="view-all-btn">Xem Phân Loại Đặc Sắc <span className="arrow">→</span></button>
                     </div>
                 </div>
             </section >
 
-            {/* 5. Author's Collection */}
-            < section className="authors-section" >
+            {/* Parallax Sale Banner Section */}
+            <section
+                ref={sectionRefs.parallax}
+                data-section="parallax"
+                className={`parallax-banner-section reveal-on-scroll ${visibleSections.parallax ? 'visible' : ''}`}
+            >
+                <div
+                    ref={parallaxBgRef}
+                    className="parallax-bg"
+                    style={{ backgroundImage: `url(${parallaxBg})` }}
+                ></div>
+                <div className="banner-sale-content">
+                    <span className="sale-tag">Get 25%</span>
+                    <h2>Discount In All <br />Kind Of Super Selling</h2>
+                    <button className="banner-shop-btn">
+                        Shop Now <span className="arrow">→</span>
+                    </button>
+                </div>
+            </section>
+
+            {/* 4.5. Community Spotlight - Modern Testimonials */}
+            <section
+                ref={sectionRefs.testimonials}
+                data-section="testimonials"
+                className={`community-spotlight reveal-on-scroll ${visibleSections.testimonials ? 'visible' : ''}`}
+            >
                 <div className="section-container">
-                    <div className="section-header-centered"><span className="section-subtitle-small">BẬC THẦY TRI THỨC</span><h2 className="section-title-large">Tác Giả Nổi Bật</h2></div>
-                    <div className="authors-grid">
-                        {topAuthors.map((author, index) => (
-                            <div key={index} className="author-card">
-                                <div className="author-img-wrapper"><img src={getAuthorImg(author, index)} alt={author.authorName} /></div>
-                                <h4>{author.authorName}</h4><p>{author.totalSold > 0 ? `${author.totalSold} lượt bán` : 'Tác giả triển vọng'}</p>
+                    <div className="spotlight-header">
+                        <h2>Độc giả nói gì về chúng tôi?</h2>
+                        <p>Hơn 10,000+ người đã tìm thấy cảm hứng từ thư viện của Bookstore</p>
+                    </div>
+                    <div className="spotlight-grid">
+                        {testimonials.map((item, i) => (
+                            <div key={i} className="spotlight-item">
+                                <div className="spotlight-card-content">
+                                    <div className="stars-row">★★★★★</div>
+                                    <p>"{item.comment}"</p>
+                                    <div className="spotlight-user">
+                                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${item.name}`} alt={item.name} />
+                                        <div className="user-text">
+                                            <strong>{item.name}</strong>
+                                            <span>{item.role}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         ))}
                     </div>
                 </div>
+            </section>
+
+            {/* 5. Author's Collection */}
+            <section
+                ref={sectionRefs.authors}
+                data-section="authors"
+                className={`authors-section reveal-on-scroll ${visibleSections.authors ? 'visible' : ''}`}
+            >
+                <div className="section-container">
+                    <div className="section-header-centered"><span className="section-subtitle-small">BẬC THẦY TRI THỨC</span><h2 className="section-title-large">Tác Giả Nổi Bật</h2></div>
+                    <div className="authors-grid">
+                        {topAuthors.length > 0 ? topAuthors.map((author, index) => (
+                            <div key={index} className="author-card">
+                                <div className="author-img-wrapper">
+                                    <img
+                                        src={getAuthorImg(author, index)}
+                                        alt={author.authorName}
+                                        loading="lazy"
+                                    />
+                                </div>
+                                <h4>{author.authorName}</h4>
+                                <p>
+                                    {author.bookCount || 0} tác phẩm {author.totalSold > 0 ? `| ${author.totalSold} lượt bán` : ''}
+                                </p>
+                            </div>
+                        )) : (
+                            <div className="no-data-simple">Đang cập nhật danh sách tác giả</div>
+                        )}
+                    </div>
+                    <div className="view-all-wrapper">
+                        <button className="view-all-btn">Khám Phá Toàn Bộ Tác Giả <span className="arrow">→</span></button>
+                    </div>
+                </div>
             </section >
+
+            {/* 6. Newsletter Section (Overlapping Footer Style) */}
+            <section
+                ref={sectionRefs.newsletter}
+                data-section="newsletter"
+                className={`newsletter-section reveal-on-scroll ${visibleSections.newsletter ? 'visible' : ''}`}
+            >
+                <div className="newsletter-box-premium">
+                    {/* Decorative Blurred Shapes for depth */}
+                    <div className="blur-shape shape-1"></div>
+                    <div className="blur-shape shape-2"></div>
+                    <div className="blur-shape shape-3"></div>
+
+                    <div className="newsletter-premium-content">
+                        <h2 className="premium-title">Hội Sách Online 2024</h2>
+                        <p className="premium-subtitle">
+                            Các tác giả của chúng tôi luôn tận tâm với công việc viết lách của mình và mong muốn được chia sẻ nhiều thông tin hơn về những cuốn sách của họ với bạn.
+                            Sau đó, bạn có thể khám phá ở bất cứ đâu.
+                        </p>
+                        <div className="newsletter-premium-actions">
+                            <form className="newsletter-premium-form" onSubmit={e => e.preventDefault()}>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    autoComplete="email"
+                                    placeholder="Nhập địa chỉ email của bạn…"
+                                    className="newsletter-premium-input"
+                                    spellCheck={false}
+                                    required
+                                />
+                                <button type="submit" className="registration-btn-premium">ĐĂNG KÝ NGAY</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Quick View Modal */}
+            {quickViewBook && (
+                <div className="quickview-modal-overlay" onClick={() => setQuickViewBook(null)}>
+                    <div className="quickview-modal-content glass" onClick={e => e.stopPropagation()}>
+                        <button className="close-modal" onClick={() => setQuickViewBook(null)}>&times;</button>
+                        <div className="qv-body">
+                            <div className="qv-image"><img src={getBookImg(quickViewBook.imagePath)} alt={quickViewBook.title} /></div>
+                            <div className="qv-details">
+                                <span className="qv-category">{quickViewBook.category?.name}</span>
+                                <h2>{quickViewBook.title}</h2>
+                                <p className="qv-author">Tác giả: <b>{quickViewBook.author}</b></p>
+                                <div className="qv-price-row">
+                                    <span className="qv-price">{quickViewBook.price?.toLocaleString()} VNĐ</span>
+                                    {quickViewBook.isOnSale && <span className="qv-old-price">{quickViewBook.price?.toLocaleString()} VNĐ</span>}
+                                </div>
+                                <p className="qv-desc">Mô tả tóm tắt về cuốn sách này sẽ được hiển thị ở đây để người dùng có cái nhìn nhanh nhất về nội dung. Đọc thêm để khám phá những câu chuyện thú vị đằng sau tác phẩm này...</p>
+                                <div className="qv-actions">
+                                    <button className="qv-add-cart">THÊM VÀO GIỎ</button>
+                                    <button className="qv-wishlist">⭐</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     );
 };

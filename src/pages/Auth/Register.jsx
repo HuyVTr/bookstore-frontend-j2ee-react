@@ -4,6 +4,8 @@ import api from '../../services/api';
 import './Login.css'; // Reusing Layout CSS
 import './Register.css'; // Unique styles for Register if needed
 
+import logo from '../../assets/logo/logo.jpg';
+
 const Register = () => {
     const [formData, setFormData] = useState({
         username: '',
@@ -53,105 +55,119 @@ const Register = () => {
     };
 
     return (
-        <div className="login-auth-wrapper"> {/* Reusing Login structure */}
-            {/* Branding Side */}
-            <div className="auth-side-branding" style={{ backgroundImage: "linear-gradient(135deg, rgba(15, 17, 21, 0.92), rgba(15, 17, 21, 0.6)), url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&q=80&w=2000')" }}>
-                <div className="stitch-logo-indicator">
-                    <div style={{ width: '32px', height: '32px', backgroundColor: '#46ec13', borderRadius: '8px' }}></div>
-                    BOOKSTORE
+        <div className="login-auth-wrapper register-page-specific">
+            <div className="form-container-all">
+                {/* Form Side (Left) */}
+                <div className="auth-side-form">
+                    <div className="form-container-stitch">
+                        <div className="form-header">
+                            <h2>Đăng ký</h2>
+                            <p>Chào mừng bạn! Hãy tham gia cùng cộng đồng mọt sách ngay.</p>
+                        </div>
+
+                        <div className="social-grid">
+                            <a href={GOOGLE_AUTH_URL} className="social-stitch-btn" title="Đăng ký với Google" aria-label="Đăng ký với Google">
+                                <img src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png" alt="Google" />
+                            </a>
+                            <a href={GITHUB_AUTH_URL} className="social-stitch-btn" title="Đăng ký với GitHub" aria-label="Đăng ký với GitHub">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" />
+                            </a>
+                            <a href={FACEBOOK_AUTH_URL} className="social-stitch-btn" title="Đăng ký với Facebook" aria-label="Đăng ký với Facebook">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="Facebook" />
+                            </a>
+                        </div>
+
+                        <div className="auth-divider">
+                            <span>HOẶC</span>
+                        </div>
+
+                        {error && <div aria-live="polite" style={{ color: '#ff4d4d', marginBottom: '16px', fontSize: '0.9rem', textAlign: 'center', fontWeight: 'bold' }}>{error}</div>}
+                        {success && <div aria-live="polite" style={{ color: '#46ec13', marginBottom: '16px', fontSize: '1rem', textAlign: 'center', fontWeight: 'bold' }}>{success}</div>}
+
+                        <form className="stitch-login-form" onSubmit={handleRegister}>
+                            <div className="stitch-form-group">
+                                <label htmlFor="reg-username">Tên đăng nhập (Username)</label>
+                                <input
+                                    id="reg-username"
+                                    type="text"
+                                    name="username"
+                                    className="stitch-input"
+                                    placeholder="Nhập tên đăng nhập"
+                                    value={formData.username}
+                                    onChange={handleChange}
+                                    required
+                                    autoComplete="username"
+                                />
+                            </div>
+                            <div className="stitch-form-group">
+                                <label htmlFor="reg-email">Địa chỉ Email</label>
+                                <input
+                                    id="reg-email"
+                                    type="email"
+                                    name="email"
+                                    className="stitch-input"
+                                    placeholder="yourname@gmail.com"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    required
+                                    autoComplete="email"
+                                    inputMode="email"
+                                    spellCheck={false}
+                                />
+                            </div>
+                            <div className="stitch-form-group">
+                                <label htmlFor="reg-password">Mật khẩu</label>
+                                <input
+                                    id="reg-password"
+                                    type="password"
+                                    name="password"
+                                    className="stitch-input"
+                                    placeholder="Nhập mật khẩu"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    required
+                                    autoComplete="new-password"
+                                />
+                            </div>
+                            <div className="stitch-form-group">
+                                <label htmlFor="reg-confirm">Xác nhận mật khẩu</label>
+                                <input
+                                    id="reg-confirm"
+                                    type="password"
+                                    name="confirmPassword"
+                                    className="stitch-input"
+                                    placeholder="Nhập lại mật khẩu"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    required
+                                    autoComplete="new-password"
+                                />
+                            </div>
+                            <button type="submit" className="stitch-submit-btn" disabled={loading}>
+                                {loading ? 'Đang tạo tài khoản…' : 'Tạo tài khoản ngay'}
+                            </button>
+                        </form>
+
+                        <div className="auth-footer">
+                            Đã có tài khoản? <Link to="/login">Đăng nhập</Link>
+                        </div>
+                    </div>
                 </div>
-                <div className="branding-content">
-                    <h1 style={{ textShadow: "0 4px 12px rgba(0, 0, 0, 0.5)" }}>Bắt đầu hành trình đọc sách của bạn.</h1>
-                    <p style={{ color: "#e0e6ed", textShadow: "0 2px 8px rgba(0, 0, 0, 0.6)" }}>Tạo tài khoản để lưu lại những cuốn sách yêu thích, theo dõi đơn hàng và nhận những ưu đãi đặc biệt.</p>
-                </div>
-            </div>
 
-            {/* Form Side */}
-            <div className="auth-side-form">
-                <div className="form-container-stitch">
-                    <div className="form-header">
-                        <h2>Tạo tài khoản</h2>
-                        <p>Tham gia cộng đồng yêu sách của chúng tôi.</p>
+                {/* Visual/Branding Side (Right) */}
+                <div className="auth-side-branding">
+                    {/* Floating background elements */}
+                    <div className="floating-shape shape-1" aria-hidden="true"></div>
+                    <div className="floating-shape shape-2" aria-hidden="true"></div>
+                    <div className="floating-shape shape-3" aria-hidden="true"></div>
+
+                    <div className="stitch-logo-indicator">
+                        <img src={logo} alt="Bookstore Logo" className="auth-brand-logo" />
+                        <span>BOOKSTORE</span>
                     </div>
-
-                    <div className="social-grid">
-                        <a href={GOOGLE_AUTH_URL} className="social-stitch-btn">
-                            <img src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png" alt="Google" />
-                            Đăng ký với Google
-                        </a>
-                        <a href={GITHUB_AUTH_URL} className="social-stitch-btn">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" style={{ filter: 'invert(1)' }} />
-                            Đăng ký với GitHub
-                        </a>
-                        <a href={FACEBOOK_AUTH_URL} className="social-stitch-btn">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="Facebook" />
-                            Đăng ký với Facebook
-                        </a>
-                    </div>
-
-                    <div className="auth-divider">
-                        <span>HOẶC</span>
-                    </div>
-
-                    {error && <div style={{ color: '#ff4d4d', marginBottom: '16px', fontSize: '0.9rem', textAlign: 'center' }}>{error}</div>}
-                    {success && <div style={{ color: '#46ec13', marginBottom: '16px', fontSize: '1rem', textAlign: 'center' }}>{success}</div>}
-
-                    <form className="stitch-login-form" onSubmit={handleRegister}>
-                        <div className="stitch-form-group">
-                            <label>Tên đăng nhập (Username)</label>
-                            <input
-                                type="text"
-                                name="username"
-                                className="stitch-input"
-                                placeholder="Nhập tên đăng nhập duy nhất"
-                                value={formData.username}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className="stitch-form-group">
-                            <label>Địa chỉ Email</label>
-                            <input
-                                type="email"
-                                name="email"
-                                className="stitch-input"
-                                placeholder="name@company.com"
-                                value={formData.email}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className="stitch-form-group">
-                            <label>Mật khẩu</label>
-                            <input
-                                type="password"
-                                name="password"
-                                className="stitch-input"
-                                placeholder="Tạo mật khẩu mạnh"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className="stitch-form-group">
-                            <label>Xác nhận mật khẩu</label>
-                            <input
-                                type="password"
-                                name="confirmPassword"
-                                className="stitch-input"
-                                placeholder="Nhập lại mật khẩu"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <button type="submit" className="stitch-submit-btn" disabled={loading}>
-                            {loading ? 'Đang tạo tài khoản...' : 'Tạo tài khoản mới'}
-                        </button>
-                    </form>
-
-                    <div className="auth-footer">
-                        Đã có tài khoản? <Link to="/login">Đăng nhập ngay!</Link>
+                    <div className="branding-content">
+                        <h1>Bắt đầu hành trình <br />đọc sách.</h1>
+                        <p>Tạo tài khoản để lưu lại những cuốn sách yêu thích và nhận thông báo về những đầu sách mới nhất.</p>
                     </div>
                 </div>
             </div>

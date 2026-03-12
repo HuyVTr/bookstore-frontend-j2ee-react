@@ -9,7 +9,7 @@
   --header-height: 70px;
   --border-radius: 12px;
   --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  --transition: all 0.3s ease;
+  --transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 * {
@@ -34,11 +34,28 @@ ul {
   list-style: none;
 }
 
-button {
-  cursor: pointer;
-  border: none;
+button, input, select, textarea {
   outline: none;
   font-family: inherit;
+}
+
+/* Chuẩn focus-visible của Vercel/Geist */
+:focus-visible {
+  outline: 2px solid var(--secondary-color);
+  outline-offset: 2px;
+}
+
+/* Typography utilities */
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-pretty {
+  text-wrap: pretty;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Glassmorphism utility */

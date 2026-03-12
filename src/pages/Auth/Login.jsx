@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import './Login.css';
 
+import logo from '../../assets/logo/logo.jpg';
+
 const Login = () => {
     const [loginId, setLoginId] = useState('');
     const [password, setPassword] = useState('');
@@ -41,78 +43,88 @@ const Login = () => {
     };
 
     return (
-        <div className="login-auth-wrapper">
-            {/* Branding Side */}
-            <div className="auth-side-branding">
-                <div className="stitch-logo-indicator">
-                    <div style={{ width: '32px', height: '32px', backgroundColor: '#46ec13', borderRadius: '8px' }}></div>
-                    BOOKSTORE ADMIN
-                </div>
-                <div className="branding-content">
-                    <h1>Thế giới sách trong tầm tay bạn.</h1>
-                    <p>Truy cập bộ sưu tập, quản lý đơn hàng và khám phá hàng ngàn tựa sách với hệ thống quản lý cao cấp của chúng tôi.</p>
-                </div>
-            </div>
-
-            {/* Form Side */}
-            <div className="auth-side-form">
-                <div className="form-container-stitch">
-                    <div className="form-header">
-                        <h2>Đăng nhập</h2>
-                        <p>Rất vui được gặp lại bạn!</p>
-                    </div>
-
-                    <div className="social-grid">
-                        <a href={GOOGLE_AUTH_URL} className="social-stitch-btn">
-                            <img src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png" alt="Google" />
-                            Tiếp tục với Google
-                        </a>
-                        <a href={GITHUB_AUTH_URL} className="social-stitch-btn">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" style={{ filter: 'invert(1)' }} />
-                            Tiếp tục với GitHub
-                        </a>
-                        <a href={FACEBOOK_AUTH_URL} className="social-stitch-btn">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="Facebook" />
-                            Tiếp tục với Facebook
-                        </a>
-                    </div>
-
-                    <div className="auth-divider">
-                        <span>HOẶC</span>
-                    </div>
-
-                    {error && <div style={{ color: '#ff4d4d', marginBottom: '16px', fontSize: '0.9rem', textAlign: 'center' }}>{error}</div>}
-
-                    <form className="stitch-login-form" onSubmit={handleLogin}>
-                        <div className="stitch-form-group">
-                            <label>Email hoặc Tên đăng nhập</label>
-                            <input
-                                type="text"
-                                className="stitch-input"
-                                placeholder="Email hoặc username"
-                                value={loginId}
-                                onChange={(e) => setLoginId(e.target.value)}
-                                required
-                            />
+        <div className="login-auth-wrapper login-page-specific">
+            <div className="form-container-all">
+                {/* Form Side (Left) */}
+                <div className="auth-side-form login-form-side">
+                    <div className="form-container-stitch">
+                        <div className="form-header">
+                            <h2>Đăng nhập</h2>
+                            <p>Chào mừng bạn trở lại! Hãy đăng nhập để tiếp tục.</p>
                         </div>
-                        <div className="stitch-form-group">
-                            <label>Mật khẩu</label>
-                            <input
-                                type="password"
-                                className="stitch-input"
-                                placeholder="Nhập mật khẩu"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <button type="submit" className="stitch-submit-btn" disabled={loading}>
-                            {loading ? 'Đang xử lý...' : 'Đăng nhập vào tài khoản'}
-                        </button>
-                    </form>
 
-                    <div className="auth-footer">
-                        Chưa có tài khoản? <a href="/register">Đăng ký ngay!</a>
+                        <div className="social-grid">
+                            <a href={GOOGLE_AUTH_URL} className="social-stitch-btn" title="Tiếp tục với Google" aria-label="Tiếp tục với Google">
+                                <img src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png" alt="Google" />
+                            </a>
+                            <a href={GITHUB_AUTH_URL} className="social-stitch-btn" title="Tiếp tục với GitHub" aria-label="Tiếp tục với GitHub">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" />
+                            </a>
+                            <a href={FACEBOOK_AUTH_URL} className="social-stitch-btn" title="Tiếp tục với Facebook" aria-label="Tiếp tục với Facebook">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="Facebook" />
+                            </a>
+                        </div>
+
+                        <div className="auth-divider">
+                            <span>HOẶC</span>
+                        </div>
+
+                        {error && <div aria-live="polite" style={{ color: '#ff4d4d', marginBottom: '16px', fontSize: '0.9rem', textAlign: 'center', fontWeight: 'bold' }}>{error}</div>}
+
+                        <form className="stitch-login-form" onSubmit={handleLogin}>
+                            <div className="stitch-form-group">
+                                <label htmlFor="loginId">Email hoặc Tên đăng nhập</label>
+                                <input
+                                    id="loginId"
+                                    name="username"
+                                    type="text"
+                                    className="stitch-input"
+                                    placeholder="Nhập email hoặc username"
+                                    value={loginId}
+                                    onChange={(e) => setLoginId(e.target.value)}
+                                    required
+                                    autoComplete="username"
+                                />
+                            </div>
+                            <div className="stitch-form-group">
+                                <label htmlFor="password">Mật khẩu</label>
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    className="stitch-input"
+                                    placeholder="Nhập mật khẩu"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    autoComplete="current-password"
+                                />
+                            </div>
+                            <button type="submit" className="stitch-submit-btn" disabled={loading}>
+                                {loading ? 'Đang xử lý…' : 'Đăng nhập ngay'}
+                            </button>
+                        </form>
+
+                        <div className="auth-footer">
+                            Chưa có tài khoản? <a href="/register">Đăng ký ngay!</a>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Visual/Branding Side (Right) */}
+                <div className="auth-side-branding">
+                    {/* Floating background elements */}
+                    <div className="floating-shape shape-1" aria-hidden="true"></div>
+                    <div className="floating-shape shape-2" aria-hidden="true"></div>
+                    <div className="floating-shape shape-3" aria-hidden="true"></div>
+
+                    <div className="stitch-logo-indicator">
+                        <img src={logo} alt="Bookstore Logo" className="auth-brand-logo" />
+                        <span>BOOKSTORE</span>
+                    </div>
+                    <div className="branding-content">
+                        <h1>Thế giới sách <br />trong tầm tay.</h1>
+                        <p>Đăng nhập để quản lý bộ sưu tập cá nhân và hưởng những ưu đãi đặc biệt dành riêng cho thành viên.</p>
                     </div>
                 </div>
             </div>

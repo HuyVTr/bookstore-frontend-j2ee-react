@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import logo from '../../assets/logo/logo.jpg';
 import './Header.css';
 
 const Header = () => {
@@ -12,7 +13,7 @@ const Header = () => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 20);
         };
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
 
         // Kiểm tra login (tạm thời lấy từ localStorage)
         const token = localStorage.getItem('token');
@@ -43,7 +44,7 @@ const Header = () => {
         <header className={`header ${isScrolled ? 'scrolled glass' : ''}`}>
             <div className="header-container">
                 <Link to="/" className="logo">
-                    <span className="logo-icon">📚</span>
+                    <img src={logo} alt="Bookstore Logo" className="header-logo-img" />
                     <span className="logo-text">Bookstore</span>
                 </Link>
 
@@ -64,18 +65,24 @@ const Header = () => {
                 </nav>
 
                 <div className="header-actions">
-                    <div className="search-bar">
-                        <input type="text" placeholder="Tìm kiếm sách..." />
-                        <button className="search-btn">🔍</button>
-                    </div>
+                    <form className="search-bar" onSubmit={(e) => e.preventDefault()}>
+                        <input 
+                            type="text" 
+                            name="search"
+                            placeholder="Tìm kiếm sách…" 
+                            autoComplete="off"
+                            aria-label="Tìm kiếm sách"
+                        />
+                        <button type="submit" className="search-btn" aria-label="Gửi tìm kiếm">🔍</button>
+                    </form>
 
-                    <Link to="/cart" className="action-btn cart-btn">
-                        🛒 <span className="cart-badge">0</span>
+                    <Link to="/cart" className="action-btn cart-btn" aria-label="Giỏ hàng">
+                        🛒 {0 > 0 && <span className="cart-badge">0</span>}
                     </Link>
 
                     {isLoggedIn ? (
                         <div className="user-dropdown">
-                            <div className="avatar">👤</div>
+                            <div className="avatar" aria-label="Tài khoản người dùng">👤</div>
                             <div className="dropdown-content glass">
                                 <Link to="/profile">Hồ sơ</Link>
                                 <Link to="/orders">Đơn hàng</Link>
