@@ -27,8 +27,8 @@
 }
 
 .footer-logo-img {
-    width: 45px;
-    height: 45px;
+    width: 100px;
+    height: 100px;
     object-fit: cover;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);

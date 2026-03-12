@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../../assets/logo/logo.jpg';
 import './Header.css';
 
 const Header = () => {
+    const location = useLocation();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userRole, setUserRole] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -40,6 +42,14 @@ const Header = () => {
         navigate('/');
     };
 
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+            setSearchQuery(''); // Xóa sau khi search
+        }
+    };
+
     return (
         <header className={`header ${isScrolled ? 'scrolled glass' : ''}`}>
             <div className="header-container">
@@ -65,20 +75,26 @@ const Header = () => {
                 </nav>
 
                 <div className="header-actions">
-                    <form className="search-bar" onSubmit={(e) => e.preventDefault()}>
-                        <input 
-                            type="text" 
-                            name="search"
-                            placeholder="Tìm kiếm sách…" 
-                            autoComplete="off"
-                            aria-label="Tìm kiếm sách"
-                        />
-                        <button type="submit" className="search-btn" aria-label="Gửi tìm kiếm">🔍</button>
-                    </form>
+                    {location.pathname !== '/shop' && (
+                        <form className="search-bar" onSubmit={handleSearch}>
+                            <input 
+                                type="text" 
+                                name="search"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Tìm kiếm sách…" 
+                                autoComplete="off"
+                                aria-label="Tìm kiếm sách"
+                            />
+                            <button type="submit" className="search-btn" aria-label="Gửi tìm kiếm">🔍</button>
+                        </form>
+                    )}
 
-                    <Link to="/cart" className="action-btn cart-btn" aria-label="Giỏ hàng">
-                        🛒 {0 > 0 && <span className="cart-badge">0</span>}
-                    </Link>
+                    {isLoggedIn && (
+                        <Link to="/cart" className="action-btn cart-btn" aria-label="Giỏ hàng">
+                            🛒 {0 > 0 && <span className="cart-badge">0</span>}
+                        </Link>
+                    )}
 
                     {isLoggedIn ? (
                         <div className="user-dropdown">

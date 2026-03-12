@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import Home from './pages/Guest/Home';
+import Shop from './pages/Guest/Shop';
 import './index.css';
 
 import Login from './pages/Auth/Login';
@@ -17,6 +18,7 @@ function App() {
         <main className="app-content">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/shop" element={<Shop />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/oauth2-redirect" element={<OAuth2RedirectHandler />} />

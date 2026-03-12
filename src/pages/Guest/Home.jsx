@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import api from '../../services/api';
+import QuickViewModal from '../../components/QuickViewModal/QuickViewModal';
+import { useNavigate, Link } from 'react-router-dom';
 import './Home.css';
 import parallaxBg from '../../assets/home_banner/parallax_sale_banner.png'; // Anthony đã cập nhật tên file chuẩn của bạn!
 
@@ -10,6 +12,7 @@ const Home = () => {
     const [topAuthors, setTopAuthors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(0);
+    const navigate = useNavigate();
     const booksPerPage = 4;
 
     // Featured section states
@@ -42,7 +45,7 @@ const Home = () => {
         const currentX = e.touches ? e.touches[0].pageX : e.pageX;
         const walk = currentX - moodStartX;
         moodDragOffsetRef.current = walk;
-        
+
         if (moodTrackRef.current) {
             moodTrackRef.current.style.setProperty('--mood-drag-offset', `${walk}px`);
         }
@@ -52,13 +55,13 @@ const Home = () => {
         setIsMoodDragging(false);
         setIsMoodTransitioning(true);
         const threshold = 50;
-        
+
         if (moodDragOffsetRef.current > threshold && moodIndex > 0) {
             setMoodIndex(prev => prev - 1);
         } else if (moodDragOffsetRef.current < -threshold && moodIndex < Math.max(0, books.slice(0, 8).length - 3)) {
             setMoodIndex(prev => prev + 1);
         }
-        
+
         moodDragOffsetRef.current = 0;
         if (moodTrackRef.current) {
             moodTrackRef.current.style.setProperty('--mood-drag-offset', '0px');
@@ -352,8 +355,8 @@ const Home = () => {
                         <h1 className="hero-title text-balance">Khơi nguồn <br /><span className="text-gradient">Cảm hứng đọc</span></h1>
                         <p className="hero-description">Hệ thống quản lý sách thông minh giúp bạn tìm thấy tri thức nhanh nhất, chính xác nhất.</p>
                         <div className="hero-btns">
-                            <button className="cta-button primary magnetic-btn">Bắt đầu ngay →</button>
-                            <button className="cta-button secondary magnetic-btn">Xem danh mục</button>
+                            <button className="cta-button primary magnetic-btn" onClick={() => navigate('/shop')}>Bắt đầu ngay →</button>
+                            <button className="cta-button secondary magnetic-btn" onClick={() => navigate('/shop')}>Xem danh mục</button>
                         </div>
                         <div className="hero-mini-features">
                             <div className="mini-feature-item"><span>🚚</span><div className="m-text"><h5>Giao hàng 24h</h5><p>Đơn từ 500k</p></div></div>
@@ -429,8 +432,8 @@ const Home = () => {
                                                             height="450"
                                                         />
                                                         {/* Badge Nguồn gốc */}
-                                                        <div className={`source-badge ${book.bookSource?.toLowerCase()}`}>
-                                                            {book.bookSource === 'OFFICIAL' ? '🏛️ Official' : '✍️ Author'}
+                                                        <div className={`source-tag ${book.bookSource?.toLowerCase() || 'official'}`}>
+                                                            {book.bookSource === 'AUTHOR' ? 'Author' : 'Official'}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -450,7 +453,10 @@ const Home = () => {
                                                                 alt={book.author}
                                                             />
                                                         </div>
-                                                        <span className="author-name-new">{book.author}</span>
+                                                        <span className="author-name-new">
+                                                            {book.author}
+                                                            <small className="sold-new"> | Đã bán {book.totalSold || 0}</small>
+                                                        </span>
                                                     </div>
                                                     <div className="price-row-new tabular-nums">
                                                         <span className="price-current-new">
@@ -462,7 +468,7 @@ const Home = () => {
                                                         <span className="stock-text-new tabular-nums">{book.quantity || 0} Books In Stock</span>
                                                     </div>
                                                     <div className="spotlight-actions-new">
-                                                        <button className="q-view-btn-spotlight" onClick={() => setQuickViewBook(book)}>QUICK VIEW</button>
+                                                        <button className="q-view-btn-spotlight" onClick={() => setQuickViewBook(book)}>Xem nhanh</button>
                                                         <button className="cart-btn-round-new" aria-label={`Thêm ${book.title} vào giỏ hàng`} title="Thêm vào giỏ hàng">
                                                             <span className="cart-icon-new">🛒</span>
                                                         </button>
@@ -497,7 +503,7 @@ const Home = () => {
                         <div className="no-data">Không có dữ liệu cho mục này</div>
                     )}
                     <div className="view-all-wrapper">
-                        <button className="view-all-btn">Xem Tất Cả <span className="arrow">→</span></button>
+                        <button className="view-all-btn" onClick={() => navigate('/shop')}>Xem Tất Cả <span className="arrow">→</span></button>
                     </div>
                 </div>
             </section>
@@ -506,16 +512,16 @@ const Home = () => {
             <section className="special-offer-section edge-to-edge">
                 <div className="offer-split-container">
                     <div className="offer-image-side">
-                        <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=1000" alt="Special Collection" />
+                        <img src="https://lh3.googleusercontent.com/rd-gg-dl/AOI_d__bPI2JjhKt7P-Tirn5aZ_V6pd8GDtb044tlJxbZ2q_SIWu_iTKLIgQrX9AbT0KzmsCvJFKpF2ehOmri8a2BG3p7G8NFYGBQ8WIKG0F3lM8nUSWOM7U9DBu0TnzY9T5rEHSnsArCSHpn0tXfw4CA3GVJeDRD8ClT9O89v3ZFPiemN0pK1OQs4aElQfGbvgWuMWVJgOOrFLKZ22b13dTST-5Oj5ttvykV1uALQrkinDnVMdzmJDjz_35OnAKE8XGyUue2lJEVINXISQDtjeY-IACiOiB2v3cPsYuUulJQebRcB8dk3ci8iwAIG5sVXcQ5dJnVvFxpAkWK0bnsNUdhm2XXbMzLmtfK3mvQBiBB7sYnr_5fum-KOuzgJRdE3lUH9zeTXFGiqfde5vj2EFXQuIdS9DxCE44-6YAe_EkGdDUVU_uk16Ozz1gxT8hN-g9vm3udV7TvT9xk7L-Vmb2fFyLrMewulH5tB-6CNByfsV2ME2-88F-AuEudsJejdbQFHgvrafDj0qMwywgfobtjAfToG9X4NuJOEDI30LlDAGFJUFjSotTJCNKHMdlCHGddAeRR9c9Sm0V5IKGOo4Zk5L3_uXh3pfNFJEn5DS2PeYSLEG4jGlfFWwy1dmGwsMO45t5n5qkwf1FXCOu_jtOVMZxnmIIMuWIp0FeNezYRRZrhSbVkiBgl7PWxzHb_kCDzwdNcZqKBpMGQ8Nm9X0on7FAQOHAujzefewK5xcG8bGNRlkXsQXR31NfOzRL_FWQgdDyEwNBJ2qBCXjGzWDcRfObsi8_1CZKEKwSR0C8FtOsqFXt2yka3mT5GGQp2pGRfdI8Y9M1-Lp4l9yOXjeE3MgNmtyVLx5T461EcBPWxAjSpZp76yertlSdJzVnmurvQE7MheKZVuC5LMHl7Vh20YPrOgSZ2vH4SSRtxVOzh_n7py7ZSYBo_40Cf2TgwNsLDCTfLqVtucOyonbWAwfwOmLHOsFmHhtszsKVNg7ptCoNHinAyrPgWqSJs2WKdr1w4SibKOeA2fACSovm31uHaMc4KmmOQSr5AAN6ezFJVpTtXRtFWvRz0MdM32vgU_mLZtfm2zH2D6tTUzg-ZPug4oYgvTFNBQxKVL3Bzu_8q4p8lmFAjqL4caHtp3-pUm24l2i8RWlLdgX9WnzoojuBbFwb3-DackYD6TUL13ZVyjmghdN5DyCVRIh9h4FYOBXxN697nwYPZ6_Yt-sbIYVv3s2bpqQ8i4GJWIZm42RnrLpO9UoIrr9JiYI=s1600-rj" alt="Special Collection" />
                         <div className="offer-badge-floating">GIẢM 40%</div>
                     </div>
                     <div className="offer-content-side">
                         <span className="offer-tag">BỘ SƯU TẬP MÙA THU</span>
-                        <h2 className="offer-heading">Đánh thức <br /><span>Tâm hồn Văn chương</span></h2>
-                        <p className="offer-desc">Khám phá những tác phẩm kinh điển được tuyển chọn kỹ lưỡng, mang lại góc nhìn mới về cuộc sống và con người. Ưu đãi kéo dài đến hết tháng 3.</p>
+                        <h2 className="offer-heading">Từ Zero <br /><span>Đến Hero Lập <br />Trình</span></h2>
+                        <p className="offer-desc">Tổng hợp những đầu sách lập trình tinh hoa từ căn bản đến nâng cao. Giúp bạn làm chủ các công nghệ mới nhất và xây dựng nền tảng tư duy logic vững chắc. Ưu đãi đặc biệt dành riêng cho sinh viên IT.</p>
                         <div className="offer-actions">
-                            <button className="offer-btn-primary">KHÁM PHÁ NGAY</button>
-                            <button className="offer-btn-secondary">TÌM HIỂU THÊM</button>
+                            <button className="offer-btn-primary" onClick={() => navigate('/shop')}>KHÁM PHÁ NGAY</button>
+                            <button className="offer-btn-secondary" onClick={() => navigate('/shop')}>TÌM HIỂU THÊM</button>
                         </div>
                     </div>
                 </div>
@@ -586,19 +592,21 @@ const Home = () => {
                                         <div className="m-book-img">
                                             <img src={getBookImg(book.imagePath)} alt={book.title} />
                                             <div className="m-badges">
-                                                {idx % 2 === 0 && <span className="m-badge-hot">Hot</span>}
                                                 {book.isOnSale && <span className="m-badge-sale">-{Math.round((1 - book.discountPrice / book.price) * 100)}%</span>}
+                                                <div className={`source-tag ${book.bookSource?.toLowerCase() || 'official'}`}>
+                                                    {book.bookSource === 'AUTHOR' ? 'Author' : 'Official'}
+                                                </div>
                                             </div>
                                             <div className="m-overlay-actions">
                                                 <button className="q-view-btn-small" onClick={(e) => {
                                                     e.stopPropagation();
                                                     setQuickViewBook(book);
-                                                }}>QUICK VIEW</button>
+                                                }}>Xem nhanh</button>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="m-card-body">
-                                        <span className="m-category-name">Thiết Kế & Nghệ Thuật</span>
+                                        <span className="m-category-name">{book.category?.name || 'Chưa phân loại'}</span>
                                         <h5 className="m-title">{book.title}</h5>
                                         <div className="m-pricing-row">
                                             <span className="m-current-price">{book.isOnSale ? book.discountPrice?.toLocaleString() : book.price?.toLocaleString()}đ</span>
@@ -607,13 +615,13 @@ const Home = () => {
                                         <div className="m-author-rating-row">
                                             <div className="m-author-info">
                                                 <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${book.author}`} alt={book.author} />
-                                                <span>{book.author}</span>
+                                                <span>{book.author} <small>({book.totalSold || 0})</small></span>
                                             </div>
                                             <div className="m-stars">
                                                 {['★', '★', '★', '★', '☆'].map((s, i) => <span key={i} className={s === '★' ? 'star-fill' : 'star-empty'}>{s}</span>)}
                                             </div>
                                         </div>
-                                        <button className="m-add-cart-btn">Add To Cart</button>
+                                        <button className="m-add-cart-btn">Thêm vào giỏ hàng</button>
                                     </div>
                                 </div>
                             ))}
@@ -625,7 +633,7 @@ const Home = () => {
                         <div className="promo-text-content">
                             <h3>Find Your <br />Nest Books!</h3>
                             <p>Get Your 25% Discount Now!</p>
-                            <button className="promo-shop-btn">Shop Now <span className="arrow">→</span></button>
+                            <button className="promo-shop-btn" onClick={() => navigate('/shop')}>Shop Now <span className="arrow">→</span></button>
                         </div>
                         <div className="promo-image-wrapper">
                             <img src="/artifacts/mood_promo_girl_banner_1773223446542.png" alt="Promo" />
@@ -663,17 +671,20 @@ const Home = () => {
                                                     width="200"
                                                     height="300"
                                                 />
-                                                <div className={`source-badge ${book.bookSource?.toLowerCase()}`}>
-                                                    {book.bookSource === 'OFFICIAL' ? '🏛️ Official' : '✍️ Author'}
+                                                <div className={`source-tag ${book.bookSource?.toLowerCase() || 'official'}`}>
+                                                    {book.bookSource === 'AUTHOR' ? 'Author' : 'Official'}
                                                 </div>
                                                 <div className="add-to-cart-overlay">
-                                                    <button className="q-view-btn" onClick={() => setQuickViewBook(book)}>QUICK VIEW</button>
+                                                    <button className="q-view-btn" onClick={() => setQuickViewBook(book)}>Xem nhanh</button>
                                                     <button>THÊM VÀO GIỎ</button>
                                                 </div>
                                             </div>
                                             <div className="book-info-centered">
                                                 <h3>{book.title}</h3>
-                                                <p className="author">{book.author}</p>
+                                                <p className="author">
+                                                    {book.author}
+                                                    <span className="sold-alt"> | Đã bán {book.totalSold || 0}</span>
+                                                </p>
                                                 <p className="price">{book.price?.toLocaleString()} VNĐ</p>
                                             </div>
                                         </div>
@@ -688,7 +699,7 @@ const Home = () => {
                         </button>
                     </div>
                     <div className="view-all-wrapper">
-                        <button className="view-all-btn">Xem Phân Loại Đặc Sắc <span className="arrow">→</span></button>
+                        <button className="view-all-btn" onClick={() => navigate('/shop')}>Xem Phân Loại Đặc Sắc <span className="arrow">→</span></button>
                     </div>
                 </div>
             </section >
@@ -707,7 +718,7 @@ const Home = () => {
                 <div className="banner-sale-content">
                     <span className="sale-tag">Get 25%</span>
                     <h2>Discount In All <br />Kind Of Super Selling</h2>
-                    <button className="banner-shop-btn">
+                    <button className="banner-shop-btn" onClick={() => navigate('/shop')}>
                         Shop Now <span className="arrow">→</span>
                     </button>
                 </div>
@@ -772,7 +783,7 @@ const Home = () => {
                         )}
                     </div>
                     <div className="view-all-wrapper">
-                        <button className="view-all-btn">Khám Phá Toàn Bộ Tác Giả <span className="arrow">→</span></button>
+                        <button className="view-all-btn" onClick={() => navigate('/shop')}>Khám Phá Toàn Bộ Tác Giả <span className="arrow">→</span></button>
                     </div>
                 </div>
             </section >
@@ -813,31 +824,11 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Quick View Modal */}
-            {quickViewBook && (
-                <div className="quickview-modal-overlay" onClick={() => setQuickViewBook(null)}>
-                    <div className="quickview-modal-content glass" onClick={e => e.stopPropagation()}>
-                        <button className="close-modal" onClick={() => setQuickViewBook(null)}>&times;</button>
-                        <div className="qv-body">
-                            <div className="qv-image"><img src={getBookImg(quickViewBook.imagePath)} alt={quickViewBook.title} /></div>
-                            <div className="qv-details">
-                                <span className="qv-category">{quickViewBook.category?.name}</span>
-                                <h2>{quickViewBook.title}</h2>
-                                <p className="qv-author">Tác giả: <b>{quickViewBook.author}</b></p>
-                                <div className="qv-price-row">
-                                    <span className="qv-price">{quickViewBook.price?.toLocaleString()} VNĐ</span>
-                                    {quickViewBook.isOnSale && <span className="qv-old-price">{quickViewBook.price?.toLocaleString()} VNĐ</span>}
-                                </div>
-                                <p className="qv-desc">Mô tả tóm tắt về cuốn sách này sẽ được hiển thị ở đây để người dùng có cái nhìn nhanh nhất về nội dung. Đọc thêm để khám phá những câu chuyện thú vị đằng sau tác phẩm này...</p>
-                                <div className="qv-actions">
-                                    <button className="qv-add-cart">THÊM VÀO GIỎ</button>
-                                    <button className="qv-wishlist">⭐</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Quick View Modal Dùng Chung */}
+            <QuickViewModal 
+                book={quickViewBook} 
+                onClose={() => setQuickViewBook(null)} 
+            />
         </div >
     );
 };
