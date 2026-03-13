@@ -592,32 +592,6 @@
     letter-spacing: 1px;
 }
 
-.source-tag {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    padding: 6px 14px;
-    border-radius: 10px;
-    font-size: 0.75rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
-    z-index: 5;
-    transition: border-color 0.3s ease, background-color 0.3s ease;
-}
-
-.source-tag.official { 
-    background: linear-gradient(135deg, rgba(26, 35, 126, 0.2), rgba(26, 35, 126, 0.2)); 
-    color: white; 
-}
-
-.source-tag.author { 
-    background: linear-gradient(135deg, rgba(245, 124, 0, 0.2), rgba(245, 124, 0, 0.2)); 
-    color: white; 
-}
-
 /* Card Bottom Info */
 .card-bottom {
     display: flex;

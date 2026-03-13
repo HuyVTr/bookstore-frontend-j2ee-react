@@ -120,26 +120,13 @@
     border: 1px solid rgba(26, 35, 126, 0.1);
 }
 
-.source-tag-mini {
-    padding: 6px 16px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.source-tag-mini.official {
-    background: rgba(26, 35, 126, 0.1);
-    color: #1a237e;
-    border: 1px solid rgba(26, 35, 126, 0.2);
-}
-
-.source-tag-mini.author {
-    background: rgba(245, 124, 0, 0.1);
-    color: #f57c00;
-    border: 1px solid rgba(245, 124, 0, 0.2);
+/* Unified Source Tag Overrides for Modal */
+.qv-header-badge .source-tag {
+    position: relative;
+    top: auto;
+    right: auto;
+    box-shadow: none;
+    padding: 6px 12px;
 }
 
 .qv-details h2 {
@@ -178,6 +165,7 @@
     font-size: 2.5rem;
     font-weight: 950;
     color: #e65100; /* Richer Orange */
+    font-variant-numeric: tabular-nums;
 }
 
 .qv-old-price {
@@ -185,6 +173,7 @@
     color: #94a3b8;
     font-size: 1.3rem;
     opacity: 0.7;
+    font-variant-numeric: tabular-nums;
 }
 
 .qv-desc {

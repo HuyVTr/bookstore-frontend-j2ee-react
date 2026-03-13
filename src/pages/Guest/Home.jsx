@@ -424,7 +424,7 @@ const Home = () => {
                                         {extendedBooks.map((book, idx) => (
                                             <div className={`spotlight-card-new ${idx === currentIndex ? 'active-slide' : ''}`} key={book._loopId}>
                                                 <div className="spotlight-img-column">
-                                                    <div className="img-container-new">
+                                                    <Link to={`/book/${book.id}`} className="img-container-new">
                                                         <img
                                                             src={getBookImg(book.imagePath)}
                                                             alt={book.title}
@@ -435,7 +435,7 @@ const Home = () => {
                                                         <div className={`source-tag ${book.bookSource?.toLowerCase() || 'official'}`}>
                                                             {book.bookSource === 'AUTHOR' ? 'Author' : 'Official'}
                                                         </div>
-                                                    </div>
+                                                    </Link>
                                                 </div>
                                                 <div className="spotlight-content-column">
                                                     <div className="content-top-row">
@@ -445,7 +445,9 @@ const Home = () => {
                                                             <span className="rating-count-new">(459)</span>
                                                         </div>
                                                     </div>
-                                                    <h4 className="book-title-new">{book.title}</h4>
+                                                    <Link to={`/book/${book.id}`} className="book-link-reset">
+                                                        <h4 className="book-title-new">{book.title}</h4>
+                                                    </Link>
                                                     <div className="author-row-new">
                                                         <div className="author-avatar-new">
                                                             <img
@@ -589,7 +591,7 @@ const Home = () => {
                             {books.slice(0, 8).map((book, idx) => (
                                 <div key={book.id} className="mood-book-card">
                                     <div className="m-card-top">
-                                        <div className="m-book-img">
+                                        <Link to={`/book/${book.id}`} className="m-book-img">
                                             <img src={getBookImg(book.imagePath)} alt={book.title} />
                                             <div className="m-badges">
                                                 {book.isOnSale && <span className="m-badge-sale">-{Math.round((1 - book.discountPrice / book.price) * 100)}%</span>}
@@ -603,11 +605,13 @@ const Home = () => {
                                                     setQuickViewBook(book);
                                                 }}>Xem nhanh</button>
                                             </div>
-                                        </div>
+                                        </Link>
                                     </div>
                                     <div className="m-card-body">
                                         <span className="m-category-name">{book.category?.name || 'Chưa phân loại'}</span>
-                                        <h5 className="m-title">{book.title}</h5>
+                                        <Link to={`/book/${book.id}`} className="book-link-reset">
+                                            <h5 className="m-title">{book.title}</h5>
+                                        </Link>
                                         <div className="m-pricing-row">
                                             <span className="m-current-price">{book.isOnSale ? book.discountPrice?.toLocaleString() : book.price?.toLocaleString()}đ</span>
                                             {book.isOnSale && <span className="m-old-price">{book.price?.toLocaleString()}đ</span>}
@@ -662,15 +666,15 @@ const Home = () => {
                                 {books.length > 0 ? books.map((book) => (
                                     <div key={book.id} className="book-card-item-wrapper">
                                         <div className="book-card-alt">
-                                            <div className="book-image-container">
-                                                <img
-                                                    className="main-book-cover"
-                                                    src={getBookImg(book.imagePath)}
-                                                    alt={book.title}
-                                                    loading="lazy"
-                                                    width="200"
-                                                    height="300"
-                                                />
+                                                <Link to={`/book/${book.id}`} className="book-image-container">
+                                                    <img
+                                                        className="main-book-cover"
+                                                        src={getBookImg(book.imagePath)}
+                                                        alt={book.title}
+                                                        loading="lazy"
+                                                        width="200"
+                                                        height="300"
+                                                    />
                                                 <div className={`source-tag ${book.bookSource?.toLowerCase() || 'official'}`}>
                                                     {book.bookSource === 'AUTHOR' ? 'Author' : 'Official'}
                                                 </div>
@@ -678,9 +682,11 @@ const Home = () => {
                                                     <button className="q-view-btn" onClick={() => setQuickViewBook(book)}>Xem nhanh</button>
                                                     <button>THÊM VÀO GIỎ</button>
                                                 </div>
-                                            </div>
+                                            </Link>
                                             <div className="book-info-centered">
-                                                <h3>{book.title}</h3>
+                                                <Link to={`/book/${book.id}`} className="book-link-reset">
+                                                    <h3>{book.title}</h3>
+                                                </Link>
                                                 <p className="author">
                                                     {book.author}
                                                     <span className="sold-alt"> | Đã bán {book.totalSold || 0}</span>

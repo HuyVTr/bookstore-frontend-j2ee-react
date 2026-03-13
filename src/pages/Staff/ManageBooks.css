@@ -1,0 +1,149 @@
+.manage-books-container {
+    padding-top: 120px;
+    padding-bottom: 60px;
+    min-height: 100vh;
+}
+
+.manage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.manage-header h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.manage-header p {
+    color: #64748b;
+}
+
+.add-btn-premium {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 10px 15px -3px rgba(26, 35, 126, 0.2);
+}
+
+.add-btn-premium:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 25px -5px rgba(26, 35, 126, 0.3);
+}
+
+.card-premium {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.books-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.books-table th {
+    background: #f8fafc;
+    padding: 18px 24px;
+    text-align: left;
+    font-weight: 700;
+    color: #475569;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.books-table td {
+    padding: 18px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.book-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.book-info-cell img {
+    width: 50px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.b-title {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 1rem;
+}
+
+.b-author {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.badge-category {
+    background: #e0e7ff;
+    color: #4338ca;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.b-price {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.b-stock {
+    font-weight: 600;
+}
+
+.b-stock.low {
+    color: #ef4444;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.actions button {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #475569;
+}
+
+.actions button:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: #f5f3ff;
+}
+
+.actions button.del-btn:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: #fef2f2;
+}

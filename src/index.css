@@ -3,7 +3,7 @@
   /* Xanh Navy cao cấp */
   --secondary-color: #f57c00;
   /* Cam đất nhấn */
-  --bg-color: #f8f9fa;
+  --bg-color: #f4f7fa;
   --text-color: #212121;
   --card-bg: #ffffff;
   --header-height: 70px;
@@ -79,4 +79,40 @@ button, input, select, textarea {
 .app-content {
   margin-top: var(--header-height);
   min-height: calc(100vh - var(--header-height) - 400px);
+}
+
+/* --- Global Source Tag Utility --- */
+.source-tag {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+  z-index: 5;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: white;
+}
+
+.source-tag:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+}
+
+.source-tag.official { 
+  background: linear-gradient(135deg, rgba(26, 35, 126, 0.5), rgba(26, 35, 126, 0.5)); 
+}
+
+.source-tag.author { 
+  background: linear-gradient(135deg, rgba(245, 124, 0, 0.5), rgba(245, 124, 0, 0.5)); 
 }
