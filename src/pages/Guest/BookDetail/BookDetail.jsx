@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../../services/api';
+import { useCart } from '../../../context/CartContext';
+import { useWishlist } from '../../../context/WishlistContext';
 import LoginPromptModal from '../../../components/LoginPromptModal/LoginPromptModal';
+import ReviewSection from '../../../components/Review/ReviewSection';
 import './BookDetail.css';
 
 const BookDetail = () => {
@@ -19,6 +22,8 @@ const BookDetail = () => {
     const [showLoginPrompt, setShowLoginPrompt] = useState(false);
     const [promptMessage, setPromptMessage] = useState('');
     const [selectedImage, setSelectedImage] = useState(null);
+    const { addToCart } = useCart();
+    const { toggleWishlist, isInWishlist } = useWishlist();
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -30,9 +35,15 @@ const BookDetail = () => {
                 setSelectedImage(res.data?.imagePath);
                 
                 // Fetch related books based on category
-                if (res.data?.category?.id) {
-                    const relatedRes = await api.get(`public/books/category/${res.data.category.id}?limit=4`);
-                    setRelatedBooks(relatedRes.data?.filter(b => b.id !== parseInt(id)) || []);
+                if (res.data?.category?.name) {
+                    const relatedRes = await api.get('public/books', {
+                        params: {
+                            category: res.data.category.name,
+                            pageSize: 5 // Get 5 so we can filter out the current book
+                        }
+                    });
+                    const filtered = (relatedRes.data?.books || []).filter(b => b.id !== parseInt(id));
+                    setRelatedBooks(filtered.slice(0, 4));
                 }
 
                 // Fetch real reviews
@@ -114,10 +125,11 @@ const BookDetail = () => {
             return;
         }
         
-        try {
-            alert("Đã thêm " + quantity + " sản phẩm vào giỏ hàng thành công!");
-        } catch (error) {
-            console.error(error);
+        const result = await addToCart(book, quantity);
+        if (!result.success && result.error === 'unauthorized') {
+            setShowLoginPrompt(true);
+        } else if (!result.success) {
+            alert(result.error);
         }
     };
 
@@ -129,6 +141,10 @@ const BookDetail = () => {
             return;
         }
         alert("Tính năng thanh toán đang được phát triển.");
+    };
+
+    const handleWishlist = () => {
+        toggleWishlist(book);
     };
 
     if (loading) return (
@@ -255,9 +271,14 @@ const BookDetail = () => {
                     </div>
 
                     <div className="book-extras">
-                        <button className="extra-item">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.72-8.72 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                            Yêu thích
+                        <button 
+                            className={`extra-item ${isInWishlist(book.id) ? 'active' : ''}`} 
+                            onClick={handleWishlist}
+                        >
+                            <span style={{ fontSize: '1.2rem', marginRight: '8px' }}>
+                                {isInWishlist(book.id) ? '❤️' : '🤍'}
+                            </span>
+                            {isInWishlist(book.id) ? 'Đã yêu thích' : 'Yêu thích'}
                         </button>
                         <button className="extra-item">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path></svg>
@@ -380,88 +401,16 @@ const BookDetail = () => {
                     )}
                     {activeTab === 'reviews' && (
                         <div className="tab-pane fade-in">
-                            <div className="reviews-summary">
-                                <div className="rating-avg">
-                                    <h4>{avgRating}</h4>
-                                    <div className="stars">{renderStars(avgRating)}</div>
-                                    <p>Dựa trên {reviews.length} đánh giá</p>
-                                </div>
-                                <div className="rating-bars">
-                                    {[5, 4, 3, 2, 1].map(star => {
-                                        const count = reviews.filter(r => r.rating === star).length;
-                                        const percent = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
-                                        return (
-                                            <div key={star} className="rating-bar-row">
-                                                <span>{star} ⭐</span>
-                                                <div className="bar-bg">
-                                                    <div className="bar-fill" style={{ width: `${percent}%` }}></div>
-                                                </div>
-                                                <span className="star-count">{count}</span>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-
-                            {/* Review Form (Conditional) */}
-                            {canReview && (
-                                <div className="add-review-section">
-                                    <h3>Viết đánh giá của bạn</h3>
-                                    <form onSubmit={handleSubmitReview}>
-                                        <div className="rating-selector">
-                                            <span>Chọn số sao: </span>
-                                            {[1, 2, 3, 4, 5].map(s => (
-                                                <button 
-                                                    key={s} 
-                                                    type="button"
-                                                    className={newReview.rating >= s ? 'active' : ''}
-                                                    onClick={() => setNewReview({...newReview, rating: s})}
-                                                >
-                                                    ★
-                                                </button>
-                                            ))}
-                                        </div>
-                                        <textarea 
-                                            placeholder="Cảm nhận của bạn về cuốn sách này..."
-                                            value={newReview.comment}
-                                            onChange={(e) => setNewReview({...newReview, comment: e.target.value})}
-                                            required
-                                        ></textarea>
-                                        <button type="submit" className="submit-review-btn" disabled={submitting}>
-                                            {submitting ? 'ĐANG GỬI...' : 'GỬI ĐÁNH GIÁ'}
-                                        </button>
-                                    </form>
-                                </div>
-                            )}
-
-                            {/* Review List */}
-                            <div className="review-list">
-                                {reviews.length > 0 ? (
-                                    reviews.map(review => (
-                                        <div key={review.id} className="review-item">
-                                            <div className="review-header">
-                                                <div className="user-info">
-                                                    <div className="user-avatar">
-                                                        {review.user?.fullName?.charAt(0) || review.user?.username?.charAt(0) || '?'}
-                                                    </div>
-                                                    <div>
-                                                        <p className="user-name">{review.user?.fullName || review.user?.username}</p>
-                                                        <p className="review-date">{new Date(review.createdAt).toLocaleDateString('vi-VN')}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="review-stars">{renderStars(review.rating)}</div>
-                                            </div>
-                                            <p className="review-comment">{review.comment}</p>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="no-reviews">
-                                        <p>Chưa có đánh giá nào cho cuốn sách này. 
-                                            {!canReview && " Chỉ những khách hàng đã mua sản phẩm mới có thể đánh giá."}
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
+                            <ReviewSection 
+                                bookId={id}
+                                reviews={reviews}
+                                canReview={canReview}
+                                onReviewSubmitted={async () => {
+                                    const reviewsRes = await api.get(`public/reviews/book/${id}`);
+                                    setReviews(reviewsRes.data || []);
+                                    setCanReview(false);
+                                }}
+                            />
                         </div>
                     )}
                 </div>

@@ -1,10 +1,38 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import api from '../../services/api';
+import { useCart } from '../../context/CartContext';
+import { useWishlist } from '../../context/WishlistContext';
 import './QuickViewModal.css';
 
 const QuickViewModal = ({ book, onClose }) => {
     const navigate = useNavigate();
+    const { addToCart } = useCart();
+    const { toggleWishlist, isInWishlist } = useWishlist();
+
     if (!book) return null;
+
+    const handleAddToCart = async (book) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            if (window.confirm("Vui lòng đăng nhập để thêm vào giỏ hàng. Đi tới trang đăng nhập?")) {
+                navigate('/login');
+                onClose();
+            }
+            return;
+        }
+
+        const result = await addToCart(book, 1);
+        if (!result.success) {
+            alert(result.error);
+        }
+    };
+
+    const handleWishlistClick = (e, book) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleWishlist(book);
+    };
 
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('vi-VN', {
@@ -59,7 +87,9 @@ const QuickViewModal = ({ book, onClose }) => {
                             Hãy khám phá thêm những câu chuyện đầy cảm hứng và kiến thức giá trị bên trong cuốn sách này…
                         </p>
                         <div className="qv-actions">
-                            <button className="qv-add-cart">THÊM VÀO GIỎ</button>
+                            <button className="qv-add-cart" onClick={() => handleAddToCart(book)}>
+                                THÊM VÀO GIỎ
+                            </button>
                             <Link 
                                 to={`/book/${book.id}`} 
                                 className="qv-details-btn" 
@@ -67,8 +97,12 @@ const QuickViewModal = ({ book, onClose }) => {
                             >
                                 XEM CHI TIẾT
                             </Link>
-                            <button className="qv-wishlist" aria-label="Thêm vào danh sách yêu thích">
-                                <Icons.Heart />
+                            <button 
+                                className={`qv-wishlist ${isInWishlist(book.id) ? 'active' : ''}`} 
+                                onClick={(e) => handleWishlistClick(e, book)}
+                                aria-label="Thêm vào danh sách yêu thích"
+                            >
+                                <Icons.Heart filled={isInWishlist(book.id)} />
                             </button>
                         </div>
                     </div>
@@ -80,7 +114,9 @@ const QuickViewModal = ({ book, onClose }) => {
 
 const Icons = {
     Close: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
-    Heart: () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.72-8.72 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    Heart: ({ filled }) => (
+        <span style={{ fontSize: '1.3rem' }}>{filled ? '❤️' : '🤍'}</span>
+    )
 };
 
 export default QuickViewModal;

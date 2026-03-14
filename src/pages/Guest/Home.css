@@ -615,27 +615,23 @@
     animation: shine 8s linear infinite;
 }
 
-.text-gradient {
-    /* Gentle & Sophisticated Blue Transition */
-    background: linear-gradient(-70deg,
+.hero-text-gradient {
+    /* Fixed: Premium Indigo-Violet Gradient with Shine effect */
+    background: linear-gradient(135deg,
             #1a237e 0%,
-            #283593 45%,
-            #3f51b5 55%,
+            #3949ab 25%,
+            #5c6bc0 50%,
+            #3949ab 75%,
             #1a237e 100%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-
-    /* Subtle lift instead of heavy 3D */
-    text-shadow: 0 4px 15px rgba(26, 35, 126, 0.15);
-
+    filter: drop-shadow(0 4px 10px rgba(26, 35, 126, 0.2));
     display: inline-block;
     padding: 0.1em 0;
-    /* Vertical space for accents */
     margin: -0.1em 0;
-    /* Offset padding to maintain layout */
-    animation: shine 8s linear infinite;
+    animation: shine 6s linear infinite;
 }
 
 @keyframes shine {
@@ -1125,17 +1121,20 @@
 
 .add-to-cart-overlay {
     position: absolute;
-    bottom: -10px;
+    bottom: -15px;
     left: 50%;
     transform: translateX(-50%) translateY(20px);
-    width: 85%;
+    width: 90%;
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Fixed: Add gap to prevent buttons from sticking together */
 }
 
 .book-card-alt:hover .add-to-cart-overlay {
-    bottom: 20px;
+    bottom: 25px;
     transform: translateX(-50%) translateY(0);
     opacity: 1;
 }
@@ -1143,17 +1142,30 @@
 
 .add-to-cart-overlay button {
     width: 100%;
-    padding: 12px 20px;
+    padding: 10px 15px;
     background: var(--primary-color);
     border: none;
     color: white;
     font-weight: 700;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     cursor: pointer;
     border-radius: 50px;
-    box-shadow: 0 10px 20px rgba(26, 35, 126, 0.3);
+    box-shadow: 0 10px 20px rgba(26, 35, 126, 0.2);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.add-to-cart-overlay button.q-view-btn {
+    background: #fff;
+    color: var(--primary-color);
+    border: 1.5px solid var(--primary-color);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.add-to-cart-overlay button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
 }
 
 .book-info-centered {
@@ -1187,6 +1199,60 @@
     color: #e65100;
     font-size: 1.15rem;
     margin-top: auto;
+    margin-bottom: 5px;
+}
+
+.book-action-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.add-to-cart-btn-simple {
+    flex: 1;
+    padding: 10px 15px;
+    background: #1a237e;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.add-to-cart-btn-simple:hover {
+    background: #e65100;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(230, 81, 0, 0.2);
+}
+
+.wishlist-btn-simple {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.wishlist-btn-simple:hover {
+    background: #fff;
+    border-color: #e65100;
+    transform: scale(1.05);
+}
+
+.wishlist-btn-simple.active {
+    background: #fff5f2;
+    border-color: #ff9e80;
 }
 
 .section-footer {
@@ -2736,11 +2802,12 @@
 
 .mood-books-grid {
     display: flex;
-    gap: 25px;
-    margin-top: 30px;
-    align-items: stretch;
+    gap: 10px;
+    margin-top: 40px;
+    align-items: flex-start; /* Fixed overlap by aligning items correctly */
     position: relative;
     padding-bottom: 20px;
+    width: 100%;
 }
 
 .mood-slider-window {
@@ -2757,15 +2824,23 @@
 
 .mood-track {
     display: flex;
-    gap: 20px;
-    --mood-card-width: 250px;
-    /* Fixed width for slider logic */
+    gap: var(--mood-card-gap, 25px);
+    --mood-card-width: 270px;
+    --mood-card-gap: 25px;
     will-change: transform;
     contain: layout;
+    width: max-content;
+    padding-left: 2px;
+}
+
+
+.mood-track.dragging {
+    cursor: grabbing;
 }
 
 .mood-track.dragging .mood-book-card {
     transition: none !important;
+    pointer-events: none; /* Block all hover/click while dragging */
 }
 
 .mood-track.dragging .m-book-img img {
@@ -2774,8 +2849,10 @@
 }
 
 .mood-track.dragging .m-overlay-actions {
+    opacity: 0 !important;          /* Never show overlay while dragging */
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    pointer-events: none !important;
 }
 
 .mood-book-card {
@@ -2803,19 +2880,20 @@
 
 .m-book-img {
     width: 100%;
-    height: 250px;
-    background: #f8f9fa;
-    border-radius: 15px;
+    height: 250px; /* Further reduced for compactness */
+    background: #f8fbff;
+    border-radius: 18px;
     position: relative;
     overflow: hidden;
+    display: block; /* Fixed: Critical for positioning */
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
 }
 
 .m-book-img img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Fill bleed like main cards */
-    transition: transform 0.5s ease;
+    transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .mood-book-card:hover .m-book-img img {
@@ -2836,6 +2914,7 @@
     opacity: 0;
     transition: all 0.4s ease;
     z-index: 5;
+    pointer-events: none; /* Overlay itself is not clickable - only the button inside is */
 }
 
 .mood-book-card:hover .m-overlay-actions {
@@ -2843,14 +2922,15 @@
 }
 
 .q-view-btn-small {
-    padding: 10px 20px;
-    font-size: 0.75rem;
+    padding: 12px 28px;
+    font-size: 0.85rem;
     background: #ffffff;
     color: #1a237e;
     border: none;
     border-radius: 50px;
     font-weight: 800;
     cursor: pointer;
+    pointer-events: auto; /* Re-enable click for this button even though overlay has pointer-events:none */
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
     transform: translateY(15px);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -2891,124 +2971,196 @@
 }
 
 .m-card-body {
-    padding: 0 15px 15px;
+    padding: 0 20px 20px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .m-category-name {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: #94a3b8;
     font-weight: 500;
 }
 
 .m-title {
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: 800;
     color: #1a237e;
-    margin: 0;
+    margin: 5px 0;
     line-height: 1.4;
+    height: 3.36rem; /* Fixed height for 2 lines: 1.2 * 1.4 * 2 */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     line-clamp: 2;
     overflow: hidden;
-    height: 2.8em;
 }
 
 .m-pricing-row {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     margin-bottom: 5px;
 }
 
 .m-current-price {
-    font-size: 0.95rem;
+    font-size: 1.15rem;
     font-weight: 800;
     color: #334155;
+    background: linear-gradient(90deg, #1a237e, #3949ab);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .m-old-price {
     font-size: 0.85rem;
     text-decoration: line-through;
     color: #81c784;
-    /* Light green strike like in image */
 }
 
-.m-author-rating-row {
+.m-author-minimal {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 8px 0;
+    gap: 10px;
+    margin-top: 8px;
+    margin-bottom: 12px;
 }
 
-.m-author-info {
+.m-author-avatar-tiny {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    object-fit: cover;
+    border: 1px solid #e2e8f0;
+}
+
+.m-author-minimal span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.m-stats-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    margin-bottom: 8px;
+    padding-top: 10px;
+    border-top: 1px dashed #e2e8f0;
+}
+
+.m-sold-info {
+    display: flex;
+    align-items: center;
+}
+
+.m-sold-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #3f51b5;
+    background: #f5f7ff;
+    padding: 4px 12px;
+    border-radius: 8px;
+    border: 1px solid #e8eaf6;
+    letter-spacing: 0.2px;
+}
+
+.m-stars {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.m-author-info img {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: #f1f5f9;
-}
-
-.m-author-info span {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #64748b;
-}
-
-.m-stars {
+.stars-wrapper {
     display: flex;
-    gap: 2px;
+    gap: 3px;
 }
 
 .star-fill {
-    color: #1a237e;
-    font-size: 0.8rem;
+    color: #fbbf24; /* Golden yellow for premium look */
+    font-size: 0.9rem;
 }
 
 .star-empty {
-    color: #cbd5e1;
-    font-size: 0.8rem;
+    color: #e2e8f0;
+    font-size: 0.9rem;
 }
 
-.m-add-cart-btn {
-    width: 100%;
-    padding: 12px;
-    background: #f8f9fa;
-    border: none;
-    border-radius: 12px;
-    color: #1a237e;
-    font-weight: 800;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
+.m-rating-text {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.m-action-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
     margin-top: 10px;
 }
 
-.m-add-cart-btn:hover {
-    background: #1a237e;
+.m-add-cart-btn {
+    flex: 1;
+    padding: 12px 20px;
+    background: #1a237e; /* Solid navy for primary action */
+    border: none;
+    border-radius: 12px;
     color: #fff;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    white-space: nowrap;
+}
+
+.m-add-cart-btn:hover {
+    background: #e65100;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(230, 81, 0, 0.2);
+}
+
+.m-wishlist-btn {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.m-wishlist-btn:hover {
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transform: scale(1.05);
+}
+
+.m-wishlist-btn.active {
+    background: #fff5f2;
 }
 
 /* Promo Banner Vertical Style */
 .mood-promo-banner {
-    background: #1a237e;
-    /* Nice sage green from image */
+    flex: 0 0 320px;
+    background: linear-gradient(135deg, #1a237e 0%, #311b92 100%);
     border-radius: 20px;
-    padding: 30px;
+    padding: 40px 30px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     position: relative;
     overflow: hidden;
     color: #fff;
+    min-height: 550px; /* Match the height of the card grid area roughly */
+    box-shadow: 0 20px 50px rgba(26, 35, 126, 0.2);
 }
 
 .promo-text-content {
@@ -3125,11 +3277,12 @@
 }
 
 .offer-image-side {
-    flex: 1;
+    flex: 1.2; /* Slightly larger image side */
     position: relative;
     border-radius: 40px;
     overflow: hidden;
-    height: 500px;
+    height: 550px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
 }
 
 .offer-image-side img {
@@ -3487,4 +3640,360 @@
 }
 
 /* Quick View styles moved to shared component */
-
+
+/* --- Wishlist Button Styles for Home --- */
+.wishlist-btn-round-new {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-size: 1.2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.wishlist-btn-round-new:hover {
+    transform: scale(1.1);
+    border-color: #ff4757;
+    background: #fff5f5;
+}
+
+.wishlist-btn-round-new.active {
+    background: #ff4757;
+    border-color: #ff4757;
+    color: white;
+}
+
+.heart-icon-new {
+    line-height: 1;
+}
+
+/* Mood Section Wishlist */
+.wishlist-btn-small {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.wishlist-btn-small:hover {
+    transform: scale(1.15);
+    background: #fff;
+}
+
+/* Newest Section Overlay */
+.overlay-top-actions {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.overlay-top-actions button.q-view-btn {
+    flex: 1;
+}
+
+.wishlist-btn-overlay {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1.5px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.wishlist-btn-overlay:hover {
+    transform: scale(1.1);
+    background: #fff5f5;
+    border-color: #ff4757;
+}
+
+.wishlist-btn-overlay.active {
+    background: #ff4757;
+    border-color: #ff4757;
+}
+
+/* ============================================================ 
+   RESPONSIVE REFINEMENTS (Mobile & Tablet)
+   ============================================================ */
+
+@media (max-width: 1024px) {
+    .section-container {
+        padding: 0 5%;
+    }
+
+    .hero-content {
+        gap: 40px;
+    }
+
+    .featured-main-container {
+        padding: 0 20px;
+    }
+
+    .slider-offset {
+        --card-width: 85vw;
+    }
+
+    .mood-track {
+        --mood-card-width: 240px;
+        --mood-card-gap: 20px;
+    }
+
+
+    .mood-books-grid {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .mood-promo-banner {
+        flex: 0 0 auto;
+        width: 100%;
+        min-height: 300px;
+        flex-direction: row;
+        align-items: center;
+        padding: 30px;
+    }
+
+    .promo-image-wrapper {
+        width: 40%;
+        position: relative;
+        bottom: 0;
+        right: 0;
+    }
+
+    .mood-slider-window {
+        padding-top: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-content {
+        flex-direction: column;
+        text-align: center;
+        padding: 40px 15px;
+    }
+
+    .hero-text {
+        align-items: center;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+    }
+
+    .hero-btns {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .hero-mini-features {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+        width: 100%;
+    }
+
+    .mini-feature-item {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Featured Slider */
+    .slider-offset {
+        --card-width: 90vw;
+        --card-gap: 15px;
+    }
+
+    .mood-track {
+        --mood-card-width: 220px;
+        --mood-card-gap: 15px;
+    }
+
+
+    .spotlight-card-new {
+        padding: 20px;
+        gap: 15px;
+    }
+
+    .spotlight-img-column {
+        flex: 0 0 100px;
+    }
+
+    .img-container-new {
+        height: 140px;
+    }
+
+    .book-title-new {
+        font-size: 1.2rem;
+    }
+
+    .price-current-new {
+        font-size: 1.4rem;
+    }
+
+    .stock-container-new {
+        width: 100%;
+    }
+
+    .author-row-new {
+        margin-bottom: 15px;
+    }
+
+    /* Mood Section */
+    .mood-promo-banner {
+        flex-direction: column;
+        text-align: center;
+        min-height: auto;
+        padding-bottom: 60px;
+    }
+
+    .promo-image-wrapper {
+        width: 80%;
+        margin-top: 20px;
+    }
+
+    .promo-text-content h3 {
+        font-size: 1.8rem;
+    }
+
+    .promo-shop-btn {
+        margin: 0 auto;
+    }
+
+    .mood-selectors {
+        gap: 8px;
+        margin-bottom: 30px;
+    }
+
+    .mood-btn {
+        padding: 10px 18px;
+        font-size: 0.85rem;
+    }
+
+    /* Titles */
+    .section-title-large {
+        font-size: 2rem;
+    }
+
+    /* Authors */
+    .authors-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .author-img-wrapper {
+        width: 100px;
+        height: 100px;
+    }
+
+    /* Special Offer */
+    .offer-heading {
+        font-size: 2.5rem;
+    }
+
+    .offer-split-container {
+        padding: 0 20px;
+    }
+
+    .offer-image-side {
+        height: 350px;
+    }
+
+    /* Newsletter */
+    .premium-title {
+        font-size: 2rem;
+    }
+
+    .newsletter-box-premium {
+        padding: 40px 20px;
+        border-radius: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-btns {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .cta-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .spotlight-card-new {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .spotlight-img-column {
+        flex: 0 0 auto;
+        width: 140px;
+    }
+
+    .img-container-new {
+        height: 200px;
+    }
+
+    .content-top-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .author-row-new {
+        justify-content: center;
+    }
+
+    .price-row-new {
+        justify-content: center;
+    }
+
+    .spotlight-actions-new {
+        position: static;
+        margin-top: 20px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .categories-grid {
+        gap: 15px;
+    }
+
+    .category-card {
+        flex: 0 0 160px;
+        height: 160px;
+    }
+
+    .category-icon-small {
+        font-size: 2rem;
+    }
+}
+
+

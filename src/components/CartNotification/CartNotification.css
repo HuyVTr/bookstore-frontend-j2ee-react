@@ -1,0 +1,221 @@
+.cart-notification-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    width: 380px;
+    max-width: calc(100vw - 48px);
+    pointer-events: none;
+}
+
+.cart-notification-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    pointer-events: auto;
+    animation: cn-slide-in 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes cn-slide-in {
+    from {
+        transform: translateX(100%) scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.cn-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cn-success-icon {
+    width: 24px;
+    height: 24px;
+    background: #10b981;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+}
+
+.cn-status-text {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #1e293b;
+    flex: 1;
+}
+
+.cn-close-btn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px;
+    transition: all 0.2s;
+}
+
+.cn-close-btn:hover {
+    color: #0f172a;
+    transform: rotate(90deg);
+}
+
+.cn-body {
+    padding: 8px 0;
+}
+
+.cn-book-meta {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.cn-book-img {
+    width: 65px;
+    height: 90px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: #f1f5f9;
+}
+
+.cn-book-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cn-book-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cn-book-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+.cn-book-info {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cn-divider {
+    color: #e2e8f0;
+}
+
+.cn-qty {
+    font-weight: 500;
+}
+
+.cn-price {
+    font-weight: 700;
+    color: #3b82f6;
+}
+
+.cn-footer {
+    display: flex;
+    gap: 12px;
+}
+
+.cn-view-cart-btn {
+    flex: 1.5;
+    background: #1e293b;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.cn-view-cart-btn:hover {
+    background: #0f172a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.cn-continue-btn {
+    flex: 1;
+    background: rgba(226, 232, 240, 0.5);
+    color: #475569;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.cn-continue-btn:hover {
+    background: rgba(203, 213, 225, 0.8);
+}
+
+.cn-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3b82f6, #10b981);
+    width: 100%;
+    animation: cn-progress 4s linear forwards;
+}
+
+@keyframes cn-progress {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+/* Dark Mode Support (if any) */
+@media (prefers-color-scheme: dark) {
+    .cart-notification-card {
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .cn-status-text, .cn-book-title {
+        color: #f1f5f9;
+    }
+    .cn-book-info {
+        color: #94a3b8;
+    }
+    .cn-view-cart-btn {
+        background: #3b82f6;
+    }
+    .cn-continue-btn {
+        background: rgba(51, 65, 85, 0.5);
+        color: #cbd5e1;
+    }
+}

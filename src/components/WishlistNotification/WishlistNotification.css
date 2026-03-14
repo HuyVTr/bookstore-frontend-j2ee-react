@@ -1,0 +1,224 @@
+.wishlist-notification-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 10000;
+    width: 380px;
+    max-width: calc(100vw - 48px);
+    pointer-events: none;
+}
+
+.wishlist-notification-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 24px;
+    box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.15);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    pointer-events: auto;
+    animation: wn-slide-in 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.wishlist-notification-card.add {
+    border-left: 5px solid #ff4d6d;
+}
+
+.wishlist-notification-card.remove {
+    border-left: 5px solid #64748b;
+}
+
+@keyframes wn-slide-in {
+    from {
+        transform: translateX(100%) translateY(-20px) scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0) translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.wn-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.wn-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.add .wn-icon {
+    background: #ff4d6d;
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 77, 109, 0.3);
+}
+
+.remove .wn-icon {
+    background: #64748b;
+    color: white;
+    box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+}
+
+.wn-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.wn-status-text {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #1e293b;
+    flex: 1;
+    letter-spacing: -0.01em;
+}
+
+.wn-close-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wn-close-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #1e293b;
+    transform: rotate(90deg);
+}
+
+.wn-body {
+    padding: 2px 0;
+}
+
+.wn-book-meta {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.4);
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.wn-book-img {
+    width: 60px;
+    height: 85px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.wn-book-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.wn-book-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.wn-book-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;
+}
+
+.wn-book-author {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.wn-footer {
+    display: flex;
+    margin-top: 4px;
+}
+
+.wn-view-wishlist-btn {
+    width: 100%;
+    background: #1e293b;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.wn-view-wishlist-btn:hover {
+    background: #0f172a;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+}
+
+.wn-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 5px;
+    width: 100%;
+    animation: wn-progress 3s linear forwards;
+}
+
+.add .wn-progress-bar {
+    background: linear-gradient(90deg, #ff4d6d, #ff758f);
+}
+
+.remove .wn-progress-bar {
+    background: linear-gradient(90deg, #64748b, #94a3b8);
+}
+
+@keyframes wn-progress {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+[data-theme='dark'] .wishlist-notification-card {
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .wn-status-text, 
+[data-theme='dark'] .wn-book-title {
+    color: #f1f5f9;
+}
+
+[data-theme='dark'] .wn-book-meta {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}

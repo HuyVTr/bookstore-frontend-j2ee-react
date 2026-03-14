@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import { useCart } from '../../context/CartContext';
+import { useWishlist } from '../../context/WishlistContext';
 import QuickViewModal from '../../components/QuickViewModal/QuickViewModal';
 import './Shop.css';
 
@@ -14,6 +16,8 @@ const Shop = () => {
     const [userRoles, setUserRoles] = useState([]);
     const [quickViewBook, setQuickViewBook] = useState(null);
     const [localPrice, setLocalPrice] = useState({ min: '', max: '' });
+    const { addToCart } = useCart();
+    const { toggleWishlist, isInWishlist } = useWishlist();
     const itemsPerPage = 12;
 
     const [filters, setFilters] = useState({
@@ -121,8 +125,25 @@ const Shop = () => {
         Grid: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>,
         List: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>,
         Cart: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1" /><circle cx="19" cy="21" r="1" /><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" /></svg>,
-        Heart: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></svg>,
+        Heart: ({ filled }) => (
+            <span style={{ fontSize: '1.2rem' }}>{filled ? '❤️' : '🤍'}</span>
+        ),
         Eye: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
+    };
+
+    const handleAddToCart = async (book) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            if (window.confirm("Vui lòng đăng nhập để thêm vào giỏ hàng. Đi tới trang đăng nhập?")) {
+                navigate('/login');
+            }
+            return;
+        }
+
+        const result = await addToCart(book, 1);
+        if (!result.success) {
+            alert(result.error);
+        }
     };
 
     return (
@@ -299,7 +320,12 @@ const Shop = () => {
                                                     loading="lazy"
                                                 />
                                                 <div className="card-hover-overlay">
-                                                    <button className="overlay-btn main cart" title="Thêm vào giỏ hàng" aria-label="Thêm vào giỏ hàng">
+                                                    <button 
+                                                        className="overlay-btn main cart" 
+                                                        title="Thêm vào giỏ hàng" 
+                                                        aria-label="Thêm vào giỏ hàng"
+                                                        onClick={() => handleAddToCart(book)}
+                                                    >
                                                         <Icons.Cart /> Thêm giỏ hàng
                                                     </button>
                                                     <button className="overlay-btn main preview" onClick={() => setQuickViewBook(book)} aria-label="Xem nhanh thông tin sách">
@@ -307,7 +333,14 @@ const Shop = () => {
                                                     </button>
                                                     <div className="sub-actions">
                                                         {(userRoles.includes('USER') || userRoles.includes('AUTHOR')) && (
-                                                            <button className="overlay-btn small" title="Yêu thích" aria-label="Thêm vào danh sách yêu thích"><Icons.Heart /></button>
+                                                            <button 
+                                                                className={`overlay-btn small ${isInWishlist(book.id) ? 'active' : ''}`} 
+                                                                title={isInWishlist(book.id) ? "Xóa khỏi yêu thích" : "Yêu thích"} 
+                                                                aria-label="Thêm vào danh sách yêu thích"
+                                                                onClick={() => toggleWishlist(book)}
+                                                            >
+                                                                <Icons.Heart filled={isInWishlist(book.id)} />
+                                                            </button>
                                                         )}
                                                     </div>
                                                 </div>

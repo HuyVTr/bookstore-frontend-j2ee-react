@@ -1,9 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import api from '../../services/api';
+import { useCart } from '../../context/CartContext';
+import { useWishlist } from '../../context/WishlistContext';
 import QuickViewModal from '../../components/QuickViewModal/QuickViewModal';
 import { useNavigate, Link } from 'react-router-dom';
 import './Home.css';
 import parallaxBg from '../../assets/home_banner/parallax_sale_banner.png'; // Anthony đã cập nhật tên file chuẩn của bạn!
+
+import promoBanner from '../../assets/home_banner/programming_collection.png';
 
 const Home = () => {
     const [books, setBooks] = useState([]);
@@ -13,6 +17,8 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(0);
     const navigate = useNavigate();
+    const { addToCart } = useCart();
+    const { toggleWishlist, isInWishlist } = useWishlist();
     const booksPerPage = 4;
 
     // Featured section states
@@ -34,31 +40,65 @@ const Home = () => {
     const moodTrackRef = useRef(null);
     const moodDragOffsetRef = useRef(0);
 
+    const moodDragDistanceRef = useRef(0);  // Tracks drag distance to distinguish click vs drag
+    const isMoodDraggedRef = useRef(false);  // True if user actually dragged (not just clicked)
+
     const handleMoodStart = (e) => {
         setIsMoodDragging(true);
         setMoodStartX(e.touches ? e.touches[0].pageX : e.pageX);
         setIsMoodTransitioning(false);
+        moodDragDistanceRef.current = 0;
+        isMoodDraggedRef.current = false;
     };
 
     const handleMoodMove = (e) => {
         if (!isMoodDragging) return;
         const currentX = e.touches ? e.touches[0].pageX : e.pageX;
         const walk = currentX - moodStartX;
+        moodDragDistanceRef.current = Math.abs(walk);
         moodDragOffsetRef.current = walk;
+
+        // Only flag as a real drag if moved more than 5px - prevents accidental drags
+        if (moodDragDistanceRef.current > 5) {
+            isMoodDraggedRef.current = true;
+        }
 
         if (moodTrackRef.current) {
             moodTrackRef.current.style.setProperty('--mood-drag-offset', `${walk}px`);
         }
     };
 
+    const [visibleCards, setVisibleCards] = useState(3);
+    const [moodGap, setMoodGap] = useState(30);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 480) {
+                setVisibleCards(1);
+                setMoodGap(15);
+            } else if (window.innerWidth <= 768) {
+                setVisibleCards(2);
+                setMoodGap(20);
+            } else {
+                setVisibleCards(3);
+                setMoodGap(30);
+            }
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const handleMoodEnd = () => {
         setIsMoodDragging(false);
         setIsMoodTransitioning(true);
         const threshold = 50;
 
+        const maxIndex = Math.max(0, books.slice(0, 8).length - visibleCards);
+
         if (moodDragOffsetRef.current > threshold && moodIndex > 0) {
             setMoodIndex(prev => prev - 1);
-        } else if (moodDragOffsetRef.current < -threshold && moodIndex < Math.max(0, books.slice(0, 8).length - 3)) {
+        } else if (moodDragOffsetRef.current < -threshold && moodIndex < maxIndex) {
             setMoodIndex(prev => prev + 1);
         }
 
@@ -68,10 +108,20 @@ const Home = () => {
         }
     };
 
+    // Helper: suppress click events that fire right after a drag gesture
+    const handleMoodClickCapture = (e) => {
+        if (isMoodDraggedRef.current) {
+            e.stopPropagation();
+            e.preventDefault();
+            isMoodDraggedRef.current = false;
+        }
+    };
+
     const moodTrackStyle = {
-        transform: `translateX(calc(-${moodIndex} * (var(--mood-card-width) + 20px) + var(--mood-drag-offset, 0px)))`,
+        transform: `translateX(calc(-${moodIndex} * (var(--mood-card-width) + var(--mood-card-gap, ${moodGap}px)) + var(--mood-drag-offset, 0px)))`,
         transition: isMoodTransitioning ? 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1)' : 'none',
     };
+
 
     const sectionRefs = {
         categories: React.useRef(null),
@@ -340,6 +390,22 @@ const Home = () => {
 
     const getBookImg = (path) => path ? `http://localhost:8080/images/${path.split('/').pop()}` : 'https://via.placeholder.com/200x300?text=No+Cover';
 
+    const handleAddToCart = async (book, e) => {
+        if (e) e.preventDefault();
+        const token = localStorage.getItem('token');
+        if (!token) {
+            if (window.confirm("Vui lòng đăng nhập để thêm vào giỏ hàng. Đi tới trang đăng nhập?")) {
+                navigate('/login');
+            }
+            return;
+        }
+
+        const result = await addToCart(book, 1);
+        if (!result.success) {
+            alert(result.error);
+        }
+    };
+
     return (
         <div className="home-container">
             {/* 1. Hero Banner */}
@@ -352,7 +418,7 @@ const Home = () => {
                 <div className="hero-content">
                     <div className="hero-text">
                         <span className="hero-subtitle">Kiến tạo tương lai cùng tri thức</span>
-                        <h1 className="hero-title text-balance">Khơi nguồn <br /><span className="text-gradient">Cảm hứng đọc</span></h1>
+                        <h1 className="hero-title text-balance">Khơi nguồn <br /><span className="hero-text-gradient">Cảm hứng đọc</span></h1>
                         <p className="hero-description">Hệ thống quản lý sách thông minh giúp bạn tìm thấy tri thức nhanh nhất, chính xác nhất.</p>
                         <div className="hero-btns">
                             <button className="cta-button primary magnetic-btn" onClick={() => navigate('/shop')}>Bắt đầu ngay →</button>
@@ -372,7 +438,6 @@ const Home = () => {
                                 className="hero-main-img"
                                 width="400"
                                 height="600"
-                                fetchpriority="high"
                             />
                             <div className="status-badge">Best Seller</div>
                             <div className="bento-overlay"><h4>{bestSeller?.title || "Sách nổi bật"}</h4><p>{bestSeller?.author}</p></div>
@@ -395,7 +460,7 @@ const Home = () => {
                 <div className="featured-main-container">
                     <div className="section-header-centered">
                         <span className="section-subtitle-small">BỘ SƯU TẬP ĐẶC BIỆT</span>
-                        <h2 className="section-title-large">Sách Nổi Bật</h2>
+                        <h2 className="section-title-large text-balance">Sách Nổi Bật</h2>
                         <div className="featured-tabs-centered">
                             <button className={activeTab === 'featured' ? 'active' : ''} onClick={() => setActiveTab('featured')}>Nổi bật</button>
                             <button className={activeTab === 'onsale' ? 'active' : ''} onClick={() => setActiveTab('onsale')}>Giảm giá</button>
@@ -471,7 +536,20 @@ const Home = () => {
                                                     </div>
                                                     <div className="spotlight-actions-new">
                                                         <button className="q-view-btn-spotlight" onClick={() => setQuickViewBook(book)}>Xem nhanh</button>
-                                                        <button className="cart-btn-round-new" aria-label={`Thêm ${book.title} vào giỏ hàng`} title="Thêm vào giỏ hàng">
+                                                        <button 
+                                                            className={`wishlist-btn-round-new ${isInWishlist(book.id) ? 'active' : ''}`} 
+                                                            aria-label="Thêm vào yêu thích" 
+                                                            title={isInWishlist(book.id) ? "Xóa khỏi yêu thích" : "Yêu thích"}
+                                                            onClick={() => toggleWishlist(book)}
+                                                        >
+                                                            <span className="heart-icon-new">{isInWishlist(book.id) ? '❤️' : '🤍'}</span>
+                                                        </button>
+                                                        <button 
+                                                            className="cart-btn-round-new" 
+                                                            aria-label={`Thêm ${book.title} vào giỏ hàng`} 
+                                                            title="Thêm vào giỏ hàng"
+                                                            onClick={(e) => handleAddToCart(book, e)}
+                                                        >
                                                             <span className="cart-icon-new">🛒</span>
                                                         </button>
                                                     </div>
@@ -514,12 +592,11 @@ const Home = () => {
             <section className="special-offer-section edge-to-edge">
                 <div className="offer-split-container">
                     <div className="offer-image-side">
-                        <img src="https://lh3.googleusercontent.com/rd-gg-dl/AOI_d__bPI2JjhKt7P-Tirn5aZ_V6pd8GDtb044tlJxbZ2q_SIWu_iTKLIgQrX9AbT0KzmsCvJFKpF2ehOmri8a2BG3p7G8NFYGBQ8WIKG0F3lM8nUSWOM7U9DBu0TnzY9T5rEHSnsArCSHpn0tXfw4CA3GVJeDRD8ClT9O89v3ZFPiemN0pK1OQs4aElQfGbvgWuMWVJgOOrFLKZ22b13dTST-5Oj5ttvykV1uALQrkinDnVMdzmJDjz_35OnAKE8XGyUue2lJEVINXISQDtjeY-IACiOiB2v3cPsYuUulJQebRcB8dk3ci8iwAIG5sVXcQ5dJnVvFxpAkWK0bnsNUdhm2XXbMzLmtfK3mvQBiBB7sYnr_5fum-KOuzgJRdE3lUH9zeTXFGiqfde5vj2EFXQuIdS9DxCE44-6YAe_EkGdDUVU_uk16Ozz1gxT8hN-g9vm3udV7TvT9xk7L-Vmb2fFyLrMewulH5tB-6CNByfsV2ME2-88F-AuEudsJejdbQFHgvrafDj0qMwywgfobtjAfToG9X4NuJOEDI30LlDAGFJUFjSotTJCNKHMdlCHGddAeRR9c9Sm0V5IKGOo4Zk5L3_uXh3pfNFJEn5DS2PeYSLEG4jGlfFWwy1dmGwsMO45t5n5qkwf1FXCOu_jtOVMZxnmIIMuWIp0FeNezYRRZrhSbVkiBgl7PWxzHb_kCDzwdNcZqKBpMGQ8Nm9X0on7FAQOHAujzefewK5xcG8bGNRlkXsQXR31NfOzRL_FWQgdDyEwNBJ2qBCXjGzWDcRfObsi8_1CZKEKwSR0C8FtOsqFXt2yka3mT5GGQp2pGRfdI8Y9M1-Lp4l9yOXjeE3MgNmtyVLx5T461EcBPWxAjSpZp76yertlSdJzVnmurvQE7MheKZVuC5LMHl7Vh20YPrOgSZ2vH4SSRtxVOzh_n7py7ZSYBo_40Cf2TgwNsLDCTfLqVtucOyonbWAwfwOmLHOsFmHhtszsKVNg7ptCoNHinAyrPgWqSJs2WKdr1w4SibKOeA2fACSovm31uHaMc4KmmOQSr5AAN6ezFJVpTtXRtFWvRz0MdM32vgU_mLZtfm2zH2D6tTUzg-ZPug4oYgvTFNBQxKVL3Bzu_8q4p8lmFAjqL4caHtp3-pUm24l2i8RWlLdgX9WnzoojuBbFwb3-DackYD6TUL13ZVyjmghdN5DyCVRIh9h4FYOBXxN697nwYPZ6_Yt-sbIYVv3s2bpqQ8i4GJWIZm42RnrLpO9UoIrr9JiYI=s1600-rj" alt="Special Collection" />
-                        <div className="offer-badge-floating">GIẢM 40%</div>
+                        <img src={promoBanner} alt="Special Collection" />
                     </div>
                     <div className="offer-content-side">
                         <span className="offer-tag">BỘ SƯU TẬP MÙA THU</span>
-                        <h2 className="offer-heading">Từ Zero <br /><span>Đến Hero Lập <br />Trình</span></h2>
+                        <h2 className="offer-heading text-balance">Từ Zero <br /><span>Đến Hero Lập <br />Trình</span></h2>
                         <p className="offer-desc">Tổng hợp những đầu sách lập trình tinh hoa từ căn bản đến nâng cao. Giúp bạn làm chủ các công nghệ mới nhất và xây dựng nền tảng tư duy logic vững chắc. Ưu đãi đặc biệt dành riêng cho sinh viên IT.</p>
                         <div className="offer-actions">
                             <button className="offer-btn-primary" onClick={() => navigate('/shop')}>KHÁM PHÁ NGAY</button>
@@ -538,7 +615,7 @@ const Home = () => {
                 <div className="section-container">
                     <div className="section-header-centered">
                         <span className="section-subtitle-small">KHÁM PHÁ NGAY</span>
-                        <h2 className="section-title-large">Thể Loại Phổ Biến</h2>
+                        <h2 className="section-title-large text-balance">Thể Loại Phổ Biến</h2>
                     </div>
                     <div className="categories-grid">
                         {topCategories.length > 0 ? topCategories.map((item, index) => (
@@ -561,7 +638,7 @@ const Home = () => {
             <section className="mood-discovery-section section-container">
                 <div className="section-header-centered">
                     <span className="section-subtitle-small">HÔM NAY BẠN ĐỌC GÌ?</span>
-                    <h2 className="section-title-large">Khám phá theo tâm trạng</h2>
+                    <h2 className="section-title-large text-balance">Khám phá theo tâm trạng</h2>
                     <div className="mood-selectors">
                         {['all', 'Cần động lực', 'Để thư giãn', 'Muốn suy ngẫm', 'Yêu lãng mạn'].map(mood => (
                             <button
@@ -587,6 +664,7 @@ const Home = () => {
                             onTouchStart={handleMoodStart}
                             onTouchMove={handleMoodMove}
                             onTouchEnd={handleMoodEnd}
+                            onClickCapture={handleMoodClickCapture}
                         >
                             {books.slice(0, 8).map((book, idx) => (
                                 <div key={book.id} className="mood-book-card">
@@ -601,7 +679,8 @@ const Home = () => {
                                             </div>
                                             <div className="m-overlay-actions">
                                                 <button className="q-view-btn-small" onClick={(e) => {
-                                                    e.stopPropagation();
+                                                    e.preventDefault(); // Fixed: Prevent background Link navigation
+                                                    e.stopPropagation(); // Fixed: Prevent event bubbling
                                                     setQuickViewBook(book);
                                                 }}>Xem nhanh</button>
                                             </div>
@@ -612,20 +691,52 @@ const Home = () => {
                                         <Link to={`/book/${book.id}`} className="book-link-reset">
                                             <h5 className="m-title">{book.title}</h5>
                                         </Link>
+                                        <div className="m-author-minimal">
+                                            <img 
+                                                src={getAuthorImg(book.author, idx)} 
+                                                alt={book.author} 
+                                                className="m-author-avatar-tiny"
+                                            />
+                                            <span>{book.author}</span>
+                                        </div>
                                         <div className="m-pricing-row">
                                             <span className="m-current-price">{book.isOnSale ? book.discountPrice?.toLocaleString() : book.price?.toLocaleString()}đ</span>
                                             {book.isOnSale && <span className="m-old-price">{book.price?.toLocaleString()}đ</span>}
                                         </div>
-                                        <div className="m-author-rating-row">
-                                            <div className="m-author-info">
-                                                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${book.author}`} alt={book.author} />
-                                                <span>{book.author} <small>({book.totalSold || 0})</small></span>
-                                            </div>
+                                        <div className="m-stats-row">
                                             <div className="m-stars">
-                                                {['★', '★', '★', '★', '☆'].map((s, i) => <span key={i} className={s === '★' ? 'star-fill' : 'star-empty'}>{s}</span>)}
+                                                <div className="stars-wrapper">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <span key={i} className={i < Math.floor(book.rating || 0) ? 'star-fill' : 'star-empty'}>
+                                                            {i < Math.floor(book.rating || 0) ? '★' : '☆'}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                                <span className="m-rating-text">({book.reviewCount || 0})</span>
+                                            </div>
+                                            <div className="m-sold-info">
+                                                <span className="m-sold-badge">Đã bán {book.totalSold || 0}</span>
                                             </div>
                                         </div>
-                                        <button className="m-add-cart-btn">Thêm vào giỏ hàng</button>
+                                        <div className="m-action-row">
+                                            <button 
+                                                className="m-add-cart-btn"
+                                                onClick={() => handleAddToCart(book)}
+                                            >
+                                                Thêm vào giỏ
+                                            </button>
+                                            <button 
+                                                className={`m-wishlist-btn ${isInWishlist(book.id) ? 'active' : ''}`}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    toggleWishlist(book);
+                                                }}
+                                                title="Yêu thích"
+                                            >
+                                                {isInWishlist(book.id) ? '❤️' : '🤍'}
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -679,8 +790,11 @@ const Home = () => {
                                                     {book.bookSource === 'AUTHOR' ? 'Author' : 'Official'}
                                                 </div>
                                                 <div className="add-to-cart-overlay">
-                                                    <button className="q-view-btn" onClick={() => setQuickViewBook(book)}>Xem nhanh</button>
-                                                    <button>THÊM VÀO GIỎ</button>
+                                                    <button className="q-view-btn" onClick={(e) => {
+                                                        e.preventDefault(); // Fixed: Prevent Link navigation
+                                                        e.stopPropagation();
+                                                        setQuickViewBook(book);
+                                                    }}>Xem nhanh</button>
                                                 </div>
                                             </Link>
                                             <div className="book-info-centered">
@@ -692,6 +806,29 @@ const Home = () => {
                                                     <span className="sold-alt"> | Đã bán {book.totalSold || 0}</span>
                                                 </p>
                                                 <p className="price">{book.price?.toLocaleString()} VNĐ</p>
+                                                <div className="book-action-row">
+                                                    <button 
+                                                        className="add-to-cart-btn-simple"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            handleAddToCart(book);
+                                                        }}
+                                                    >
+                                                        THÊM GIỎ HÀNG
+                                                    </button>
+                                                    <button 
+                                                        className={`wishlist-btn-simple ${isInWishlist(book.id) ? 'active' : ''}`} 
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            toggleWishlist(book);
+                                                        }}
+                                                        title="Yêu thích"
+                                                    >
+                                                        {isInWishlist(book.id) ? '❤️' : '🤍'}
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
