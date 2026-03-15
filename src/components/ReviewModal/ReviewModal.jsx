@@ -14,7 +14,7 @@ const ReviewModal = ({ book, isOpen, onClose, onSuccess }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (rating === 0) {
             setError("Vui lòng chọn số sao đánh giá.");
             return;
@@ -43,26 +43,26 @@ const ReviewModal = ({ book, isOpen, onClose, onSuccess }) => {
     };
 
     const getBookImg = (path) => {
-        if (!path) return 'https://via.placeholder.com/150?text=No+Cover';
+        if (!path) return 'https://via.placeholder.com/60x80?text=No+Cover';
         if (path.startsWith('http')) return path;
-        const fileName = path.split('/').pop();
-        return `http://localhost:8080/images/${fileName}`;
+        if (path.startsWith('/images/')) return `http://localhost:8080${path}`;
+        return `http://localhost:8080/images/${path.split('/').pop()}`;
     };
 
     return (
         <div className="review-modal-overlay fadeIn">
             <div className="review-modal-content scaleUp">
                 <button className="close-review-btn" onClick={onClose}>&times;</button>
-                
+
                 <div className="review-header">
                     <h2>Đánh Giá Sản Phẩm</h2>
                     <p>Chia sẻ trải nghiệm của bạn về cuốn sách này</p>
                 </div>
 
                 <div className="review-book-info">
-                    <img 
-                        src={getBookImg(book.imagePath)} 
-                        alt={book.title} 
+                    <img
+                        src={getBookImg(book.imagePath)}
+                        alt={book.title}
                         className="review-book-img"
                     />
                     <div>

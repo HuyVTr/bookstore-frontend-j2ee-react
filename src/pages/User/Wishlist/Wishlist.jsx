@@ -31,8 +31,9 @@ const Wishlist = () => {
     };
 
     const getBookImg = (path) => {
-        if (!path) return 'https://via.placeholder.com/300x450?text=No+Cover';
+        if (!path) return 'https://via.placeholder.com/150x200?text=No+Cover';
         if (path.startsWith('http')) return path;
+        if (path.startsWith('/images/')) return `http://localhost:8080${path}`;
         return `http://localhost:8080/images/${path.split('/').pop()}`;
     };
 
@@ -60,8 +61,8 @@ const Wishlist = () => {
             <div className="wishlist-grid">
                 {wishlist.map((book) => (
                     <div key={book.id} className="wishlist-card glass hover-lift">
-                        <button 
-                            className="remove-wishlist-btn" 
+                        <button
+                            className="remove-wishlist-btn"
                             onClick={() => handleRemoveFromWishlist(book)}
                             aria-label="Remove from wishlist"
                             title="Xóa khỏi yêu thích"
@@ -75,7 +76,7 @@ const Wishlist = () => {
                                 </div>
                             </Link>
                             <div className="wishlist-img-overlay">
-                                <button 
+                                <button
                                     className="quick-view-btn-wishlist"
                                     onClick={() => setQuickViewBook(book)}
                                 >
@@ -91,7 +92,7 @@ const Wishlist = () => {
                             </div>
                         </Link>
                         <div className="wishlist-card-actions">
-                            <button 
+                            <button
                                 className="wishlist-add-cart-btn"
                                 onClick={() => handleAddToCart(book)}
                             >
@@ -103,9 +104,9 @@ const Wishlist = () => {
             </div>
 
             {quickViewBook && (
-                <QuickViewModal 
-                    book={quickViewBook} 
-                    onClose={() => setQuickViewBook(null)} 
+                <QuickViewModal
+                    book={quickViewBook}
+                    onClose={() => setQuickViewBook(null)}
                 />
             )}
         </div>

@@ -120,14 +120,7 @@
     border: 1px solid rgba(26, 35, 126, 0.1);
 }
 
-/* Unified Source Tag Overrides for Modal */
-.qv-header-badge .source-tag {
-    position: relative;
-    top: auto;
-    right: auto;
-    box-shadow: none;
-    padding: 6px 12px;
-}
+/* Các override cho source-tag trong modal đã được xóa để dùng chung thiết kế từ SourceTag component */
 
 .qv-details h2 {
     font-size: 2.8rem;

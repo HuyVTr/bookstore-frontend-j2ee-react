@@ -281,38 +281,39 @@
 
 /* Summary Card */
 .summary-card {
-    padding: 40px;
-    border-radius: 35px;
+    padding: 30px;
+    border-radius: 28px;
     position: sticky;
     top: 100px;
 }
 
 .summary-card h3 {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     font-weight: 850;
-    margin-bottom: 30px;
+    margin-bottom: 24px;
     color: #0f172a;
 }
 
-.summary-row {
+.summary-card .summary-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
-    font-size: 1.15rem;
+    margin-bottom: 16px;
+    font-size: 1rem;
     color: #475569;
 }
 
-.summary-divider {
+.summary-card .summary-divider {
     height: 1.5px;
     background: rgba(226, 232, 240, 0.8);
-    margin: 25px 0;
+    margin: 18px 0;
 }
 
-.summary-row.total {
-    font-size: 1.8rem;
+.summary-card .summary-row.total {
+    font-size: 1.4rem;
     font-weight: 950;
     color: #0f172a;
-    margin-bottom: 35px;
+    margin-bottom: 28px;
+    align-items: baseline;
 }
 
 .checkout-btn {
@@ -320,19 +321,30 @@
     background: var(--primary-color);
     color: white;
     border: none;
-    padding: 22px;
-    border-radius: 18px;
+    padding: 16px;
+    border-radius: 16px;
     font-weight: 850;
-    font-size: 1.15rem;
+    font-size: 1rem;
     cursor: pointer;
-    box-shadow: 0 12px 30px rgba(26, 35, 126, 0.3);
+    box-shadow: 0 12px 25px rgba(26, 35, 126, 0.25);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+.checkout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(26, 35, 126, 0.35);
+}
+
+.checkout-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 5px 15px rgba(26, 35, 126, 0.2);
 }
 
 .trust-badges {
-    margin-top: 35px;
+    margin-top: 24px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 12px;
 }
 
 .badge-item {

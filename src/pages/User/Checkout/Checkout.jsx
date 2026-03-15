@@ -41,11 +41,11 @@ const Checkout = () => {
 
             // Nếu đi từ Cart page và có chọn sản phẩm cụ thể
             if (location.state?.selectedIds && cartData?.cartItems) {
-                const filteredItems = cartData.cartItems.filter(item => 
+                const filteredItems = cartData.cartItems.filter(item =>
                     location.state.selectedIds.includes(item.bookId || item.id)
                 );
                 const filteredTotal = filteredItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                
+
                 cartData = {
                     ...cartData,
                     cartItems: filteredItems,
@@ -161,41 +161,41 @@ const Checkout = () => {
 
     return (
         <>
-        <form className="checkout-page-container" onSubmit={handleConfirmOrder}>
-            <div className="checkout-grid">
-                {/* Form Section */}
-                <div className="checkout-form-section">
-                    <div className="checkout-card glass-premium fade-in">
-                        <h2 className="text-balance" style={{ textWrap: 'balance' }}>Thông tin giao hàng</h2>
+            <form className="checkout-page-container" onSubmit={handleConfirmOrder}>
+                <div className="checkout-grid">
+                    {/* Form Section */}
+                    <div className="checkout-form-section">
+                        <div className="checkout-card glass-premium fade-in">
+                            <h2 className="text-balance" style={{ textWrap: 'balance' }}>Thông tin giao hàng</h2>
 
-                        <div className="delivery-mode-selector">
-                            <button
-                                type="button"
-                                className={`mode-btn ${deliveryMode === 'profile' ? 'active' : ''}`}
-                                onClick={() => setDeliveryMode('profile')}
-                            >
-                                <span className="radio-circle"></span>
-                                <div className="mode-text">
-                                    <strong>Sử dụng từ hồ sơ</strong>
-                                    <p>Giao đến địa chỉ đã lưu</p>
-                                </div>
-                            </button>
-                            <button
-                                type="button"
-                                className={`mode-btn ${deliveryMode === 'new' ? 'active' : ''}`}
-                                onClick={() => setDeliveryMode('new')}
-                            >
-                                <span className="radio-circle"></span>
-                                <div className="mode-text">
-                                    <strong>Nhập thông tin mới</strong>
-                                    <p>Giao đến địa chỉ khác</p>
-                                </div>
-                            </button>
-                        </div>
+                            <div className="delivery-mode-selector">
+                                <button
+                                    type="button"
+                                    className={`mode-btn ${deliveryMode === 'profile' ? 'active' : ''}`}
+                                    onClick={() => setDeliveryMode('profile')}
+                                >
+                                    <span className="radio-circle"></span>
+                                    <div className="mode-text">
+                                        <strong>Sử dụng từ hồ sơ</strong>
+                                        <p>Giao đến địa chỉ đã lưu</p>
+                                    </div>
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`mode-btn ${deliveryMode === 'new' ? 'active' : ''}`}
+                                    onClick={() => setDeliveryMode('new')}
+                                >
+                                    <span className="radio-circle"></span>
+                                    <div className="mode-text">
+                                        <strong>Nhập thông tin mới</strong>
+                                        <p>Giao đến địa chỉ khác</p>
+                                    </div>
+                                </button>
+                            </div>
 
-                        <div className="form-row slide-up">
-                            <div className="form-group">
-                                <label>Họ và tên người đặt</label>
+                            <div className="form-row slide-up">
+                                <div className="form-group">
+                                    <label>Họ và tên người đặt</label>
                                     <input
                                         type="text"
                                         name="senderName"
@@ -206,9 +206,9 @@ const Checkout = () => {
                                         disabled={deliveryMode === 'profile'}
                                         spellCheck={false}
                                     />
-                            </div>
-                            <div className="form-group">
-                                <label>Họ và tên người nhận</label>
+                                </div>
+                                <div className="form-group">
+                                    <label>Họ và tên người nhận</label>
                                     <input
                                         type="text"
                                         name="receiverName"
@@ -220,11 +220,11 @@ const Checkout = () => {
                                         spellCheck={false}
                                         autoComplete="name"
                                     />
+                                </div>
                             </div>
-                        </div>
-                        <div className="form-row slide-up">
-                            <div className="form-group">
-                                <label>Số điện thoại</label>
+                            <div className="form-row slide-up">
+                                <div className="form-group">
+                                    <label>Số điện thoại</label>
                                     <input
                                         type="tel"
                                         name="phoneNumber"
@@ -236,9 +236,9 @@ const Checkout = () => {
                                         autoComplete="tel"
                                         inputMode="tel"
                                     />
-                            </div>
-                            <div className="form-group">
-                                <label>Địa chỉ nhận hàng</label>
+                                </div>
+                                <div className="form-group">
+                                    <label>Địa chỉ nhận hàng</label>
                                     <input
                                         type="text"
                                         name="address"
@@ -249,179 +249,179 @@ const Checkout = () => {
                                         disabled={deliveryMode === 'profile'}
                                         autoComplete="street-address"
                                     />
+                                </div>
+                            </div>
+
+                            <div className="payment-method-section slide-up">
+                                <h3>Phương thức thanh toán</h3>
+                                <div className="payment-grid">
+                                    {[
+                                        { id: 'COD', label: 'Tiền mặt (COD)', icon: <Icons.COD /> },
+                                        { id: 'MOMO', label: 'Ví Momo', icon: <Icons.Momo />, color: '#ae2070' },
+                                        { id: 'VNPAY', label: 'Ví VNPAY', icon: <Icons.VNPay />, color: '#005baa' },
+                                        { id: 'BANKING', label: 'Thẻ ATM/Bank', icon: <Icons.Bank /> }
+                                    ].map((method, index) => (
+                                        <label key={`${method.id}-${index}`} className={`payment-card ${orderInfo.paymentMethod === method.id ? 'active' : ''}`}>
+                                            <input
+                                                type="radio"
+                                                name="paymentMethod"
+                                                value={method.id}
+                                                checked={orderInfo.paymentMethod === method.id}
+                                                onChange={handleInputChange}
+                                            />
+                                            <div className="payment-icon" style={{ borderColor: method.color }}>{method.icon}</div>
+                                            <span className="payment-label">{method.label}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="form-group slide-up" style={{ marginTop: '30px' }}>
+                                <label>Ghi chú đơn hàng (Tùy chọn)</label>
+                                <textarea
+                                    name="note"
+                                    value={orderInfo.note}
+                                    onChange={handleInputChange}
+                                    placeholder="Lưu ý cho người giao hàng…"
+                                    rows="3"
+                                ></textarea>
                             </div>
                         </div>
+                    </div>
 
-                        <div className="payment-method-section slide-up">
-                            <h3>Phương thức thanh toán</h3>
-                            <div className="payment-grid">
-                                {[
-                                    { id: 'COD', label: 'Tiền mặt (COD)', icon: <Icons.COD /> },
-                                    { id: 'MOMO', label: 'Ví Momo', icon: <Icons.Momo />, color: '#ae2070' },
-                                    { id: 'VNPAY', label: 'Ví VNPAY', icon: <Icons.VNPay />, color: '#005baa' },
-                                    { id: 'BANKING', label: 'Thẻ ATM/Bank', icon: <Icons.Bank /> }
-                                ].map((method, index) => (
-                                    <label key={`${method.id}-${index}`} className={`payment-card ${orderInfo.paymentMethod === method.id ? 'active' : ''}`}>
-                                        <input
-                                            type="radio"
-                                            name="paymentMethod"
-                                            value={method.id}
-                                            checked={orderInfo.paymentMethod === method.id}
-                                            onChange={handleInputChange}
-                                        />
-                                        <div className="payment-icon" style={{ borderColor: method.color }}>{method.icon}</div>
-                                        <span className="payment-label">{method.label}</span>
-                                    </label>
-                                ))}
+                    {/* Summary Section */}
+                    <div className="checkout-summary-section">
+                        <div className="summary-card-alt">
+                            <h3>Đơn hàng của bạn</h3>
+                            <div className="order-items-preview">
+                                {cartItems.map((item, index) => {
+                                    const itemId = item.bookId || item.id || `item-${index}`;
+                                    const cleanImgPath = item.imagePath ? item.imagePath.split('/').pop() : 'default-book.png';
+                                    return (
+                                        <div key={`checkout-item-${itemId}`} className="preview-item slide-up">
+                                            <div className="preview-img">
+                                                <img src={`http://localhost:8080/images/${cleanImgPath}`} alt={item.bookName} width="60" height="85" />
+                                                <span className="preview-qty">{item.quantity}</span>
+                                            </div>
+                                            <div className="preview-info">
+                                                <h4>{item.bookName}</h4>
+                                                <p className="tabular-nums">{formatCurrency(item.price)}</p>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
-                        </div>
 
-                        <div className="form-group slide-up" style={{ marginTop: '30px' }}>
-                            <label>Ghi chú đơn hàng (Tùy chọn)</label>
-                            <textarea
-                                name="note"
-                                value={orderInfo.note}
-                                onChange={handleInputChange}
-                                placeholder="Lưu ý cho người giao hàng…"
-                                rows="3"
-                            ></textarea>
+                            <div className="summary-total-footer fade-in">
+                                <div className="total-row">
+                                    <span>Thành tiền:</span>
+                                    <span className="price-primary tabular-nums">{formatCurrency(totalPrice)}</span>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="submit-order-btn hover-lift"
+                                    disabled={submitting}
+                                >
+                                    {submitting ? "Đang Xử Lý…" : "Xác Nhận Đặt Hàng"}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </form>
 
-                {/* Summary Section */}
-                <div className="checkout-summary-section">
-                    <div className="summary-card-alt">
-                        <h3>Đơn hàng của bạn</h3>
-                        <div className="order-items-preview">
-                            {cartItems.map((item, index) => {
-                                const itemId = item.bookId || item.id || `item-${index}`;
-                                const cleanImgPath = item.imagePath ? item.imagePath.split('/').pop() : 'default-book.png';
-                                return (
-                                    <div key={`checkout-item-${itemId}`} className="preview-item slide-up">
-                                        <div className="preview-img">
-                                            <img src={`http://localhost:8080/images/${cleanImgPath}`} alt={item.bookName} width="60" height="85" />
-                                            <span className="preview-qty">{item.quantity}</span>
-                                        </div>
-                                        <div className="preview-info">
-                                            <h4>{item.bookName}</h4>
-                                            <p className="tabular-nums">{formatCurrency(item.price)}</p>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+            {/* --- PREMIUM CONFIRMATION MODAL --- */}
+            {showConfirmModal && (
+                <div className="checkout-modal-overlay fade-in">
+                    <div className="checkout-modal-container slide-up">
+                        <div className="modal-header">
+                            <div className="success-icon-wrapper">
+                                <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" strokeWidth="3" fill="none">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </div>
+                            <h2>Xác nhận đặt hàng</h2>
+                            <p>Vui lòng kiểm tra kỹ thông tin trước khi hoàn tất</p>
                         </div>
 
-                        <div className="summary-total-footer fade-in">
-                            <div className="total-row">
-                                <span>Thành tiền:</span>
-                                <span className="price-primary tabular-nums">{formatCurrency(totalPrice)}</span>
+                        <div className="modal-body">
+                            <div className="info-grid">
+                                <div className="info-block">
+                                    <span>Người đặt</span>
+                                    <strong>{orderInfo.senderName}</strong>
+                                </div>
+                                <div className="info-block">
+                                    <span>Người nhận</span>
+                                    <strong>{orderInfo.receiverName}</strong>
+                                </div>
+                                <div className="info-block">
+                                    <span>Số điện thoại</span>
+                                    <strong>{orderInfo.phoneNumber}</strong>
+                                </div>
+                                <div className="info-block full">
+                                    <span>Địa chỉ giao hàng</span>
+                                    <strong>{orderInfo.address}</strong>
+                                </div>
+                                <div className="info-block">
+                                    <span>Thanh toán</span>
+                                    <div className={`pay-method-pill ${orderInfo.paymentMethod.toLowerCase()}`}>
+                                        {orderInfo.paymentMethod === 'COD' && "Tiền mặt (COD)"}
+                                        {orderInfo.paymentMethod === 'MOMO' && "Ví Momo"}
+                                        {orderInfo.paymentMethod === 'VNPAY' && (
+                                            <>
+                                                Ví <span className="vn">VN</span><span className="pay">PAY</span>
+                                            </>
+                                        )}
+                                        {orderInfo.paymentMethod === 'BANKING' && "Thẻ ATM/Bank"}
+                                    </div>
+                                </div>
+                                {orderInfo.note && (
+                                    <div className="info-block full">
+                                        <span>Ghi chú đơn hàng</span>
+                                        <strong>{orderInfo.note}</strong>
+                                    </div>
+                                )}
+                                <div className="info-block">
+                                    <span>Tổng cộng</span>
+                                    <strong className="text-primary">{formatCurrency(totalPrice)}</strong>
+                                </div>
                             </div>
 
-                            <button
-                                type="submit"
-                                className="submit-order-btn hover-lift"
-                                disabled={submitting}
-                            >
-                                {submitting ? "Đang Xử Lý…" : "Xác Nhận Đặt Hàng"}
+                            <div className="modal-items-mini">
+                                {cartItems.map((item, index) => {
+                                    const itemId = item.bookId || item.id || `item-${index}`;
+                                    const cleanImgPath = item.imagePath ? item.imagePath.split('/').pop() : 'default-book.png';
+                                    return (
+                                        <div key={`modal-item-${itemId}`} className="mini-item" style={{ animationDelay: `${index * 0.1}s` }}>
+                                            <img src={`http://localhost:8080/images/${cleanImgPath}`} alt={item.bookName} width="40" height="60" />
+                                            <div className="mini-qty">x{item.quantity}</div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="modal-actions">
+                            <button type="button" className="btn-cancel" onClick={() => setShowConfirmModal(false)} disabled={submitting}>
+                                Quay lại sửa
+                            </button>
+                            <button type="button" className="btn-confirm" onClick={finalSubmitOrder} disabled={submitting}>
+                                {submitting ? "Đang xử lý…" : "Xác nhận & Thanh toán"}
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
-        </form>
+            )}
 
-        {/* --- PREMIUM CONFIRMATION MODAL --- */}
-        {showConfirmModal && (
-            <div className="checkout-modal-overlay fade-in">
-                <div className="checkout-modal-container slide-up">
-                    <div className="modal-header">
-                        <div className="success-icon-wrapper">
-                            <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" strokeWidth="3" fill="none">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                        </div>
-                        <h2>Xác nhận đặt hàng</h2>
-                        <p>Vui lòng kiểm tra kỹ thông tin trước khi hoàn tất</p>
-                    </div>
-
-                    <div className="modal-body">
-                        <div className="info-grid">
-                            <div className="info-block">
-                                <span>Người đặt</span>
-                                <strong>{orderInfo.senderName}</strong>
-                            </div>
-                            <div className="info-block">
-                                <span>Người nhận</span>
-                                <strong>{orderInfo.receiverName}</strong>
-                            </div>
-                            <div className="info-block">
-                                <span>Số điện thoại</span>
-                                <strong>{orderInfo.phoneNumber}</strong>
-                            </div>
-                            <div className="info-block full">
-                                <span>Địa chỉ giao hàng</span>
-                                <strong>{orderInfo.address}</strong>
-                            </div>
-                            <div className="info-block">
-                                <span>Thanh toán</span>
-                                <div className={`pay-method-pill ${orderInfo.paymentMethod.toLowerCase()}`}>
-                                    {orderInfo.paymentMethod === 'COD' && "Tiền mặt (COD)"}
-                                    {orderInfo.paymentMethod === 'MOMO' && "Ví Momo"}
-                                    {orderInfo.paymentMethod === 'VNPAY' && (
-                                        <>
-                                            Ví <span className="vn">VN</span><span className="pay">PAY</span>
-                                        </>
-                                    )}
-                                    {orderInfo.paymentMethod === 'BANKING' && "Thẻ ATM/Bank"}
-                                </div>
-                            </div>
-                            {orderInfo.note && (
-                                <div className="info-block full">
-                                    <span>Ghi chú đơn hàng</span>
-                                    <strong>{orderInfo.note}</strong>
-                                </div>
-                            )}
-                            <div className="info-block">
-                                <span>Tổng cộng</span>
-                                <strong className="text-primary">{formatCurrency(totalPrice)}</strong>
-                            </div>
-                        </div>
-
-                        <div className="modal-items-mini">
-                            {cartItems.map((item, index) => {
-                                const itemId = item.bookId || item.id || `item-${index}`;
-                                const cleanImgPath = item.imagePath ? item.imagePath.split('/').pop() : 'default-book.png';
-                                return (
-                                    <div key={`modal-item-${itemId}`} className="mini-item" style={{ animationDelay: `${index * 0.1}s` }}>
-                                        <img src={`http://localhost:8080/images/${cleanImgPath}`} alt={item.bookName} width="40" height="60" />
-                                        <div className="mini-qty">x{item.quantity}</div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    <div className="modal-actions">
-                        <button type="button" className="btn-cancel" onClick={() => setShowConfirmModal(false)} disabled={submitting}>
-                            Quay lại sửa
-                        </button>
-                        <button type="button" className="btn-confirm" onClick={finalSubmitOrder} disabled={submitting}>
-                            {submitting ? "Đang xử lý…" : "Xác nhận & Thanh toán"}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        )}
-
-        <StatusModal 
-            isOpen={statusModal.isOpen}
-            type={statusModal.type}
-            title={statusModal.title}
-            message={statusModal.message}
-            onButtonClick={handleStatusModalClose}
-            buttonText={statusModal.type === 'success' ? 'Xem đơn hàng' : 'Quay lại'}
-        />
+            <StatusModal
+                isOpen={statusModal.isOpen}
+                type={statusModal.type}
+                title={statusModal.title}
+                message={statusModal.message}
+                onButtonClick={handleStatusModalClose}
+                buttonText={statusModal.type === 'success' ? 'Xem đơn hàng' : 'Quay lại'}
+            />
         </>
     );
 };

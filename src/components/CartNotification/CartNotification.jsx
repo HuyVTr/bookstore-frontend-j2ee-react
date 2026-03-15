@@ -12,8 +12,9 @@ const CartNotification = () => {
     const { book, quantity } = notification;
 
     const getBookImg = (path) => {
-        if (!path) return 'https://via.placeholder.com/80x120?text=Book';
+        if (!path) return 'https://via.placeholder.com/60x80?text=No+Cover';
         if (path.startsWith('http')) return path;
+        if (path.startsWith('/images/')) return `http://localhost:8080${path}`;
         return `http://localhost:8080/images/${path.split('/').pop()}`;
     };
 
@@ -56,8 +57,8 @@ const CartNotification = () => {
                 </div>
 
                 <div className="cn-footer">
-                    <button 
-                        className="cn-view-cart-btn" 
+                    <button
+                        className="cn-view-cart-btn"
                         onClick={() => {
                             navigate('/cart');
                             closeNotification();
@@ -69,7 +70,7 @@ const CartNotification = () => {
                         Tiếp tục
                     </button>
                 </div>
-                
+
                 <div className="cn-progress-bar"></div>
             </div>
         </div>

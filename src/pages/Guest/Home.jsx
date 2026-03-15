@@ -5,6 +5,7 @@ import { useWishlist } from '../../context/WishlistContext';
 import QuickViewModal from '../../components/QuickViewModal/QuickViewModal';
 import { useNavigate, Link } from 'react-router-dom';
 import './Home.css';
+import SourceTag from '../../components/SourceTag/SourceTag';
 import parallaxBg from '../../assets/home_banner/parallax_sale_banner.png'; // Anthony đã cập nhật tên file chuẩn của bạn!
 
 import promoBanner from '../../assets/home_banner/programming_collection.png';
@@ -44,23 +45,28 @@ const Home = () => {
     const isMoodDraggedRef = useRef(false);  // True if user actually dragged (not just clicked)
 
     const handleMoodStart = (e) => {
-        setIsMoodDragging(true);
+        // We don't set setIsMoodDragging(true) yet to allow normal clicks
         setMoodStartX(e.touches ? e.touches[0].pageX : e.pageX);
         setIsMoodTransitioning(false);
         moodDragDistanceRef.current = 0;
         isMoodDraggedRef.current = false;
+
+        // Track that mouse is down
+        moodTrackRef.current._isMouseDown = true;
     };
 
     const handleMoodMove = (e) => {
-        if (!isMoodDragging) return;
+        if (!moodTrackRef.current?._isMouseDown) return;
+
         const currentX = e.touches ? e.touches[0].pageX : e.pageX;
         const walk = currentX - moodStartX;
         moodDragDistanceRef.current = Math.abs(walk);
         moodDragOffsetRef.current = walk;
 
-        // Only flag as a real drag if moved more than 5px - prevents accidental drags
+        // Only flag as a real drag and set state if moved more than 5px
         if (moodDragDistanceRef.current > 5) {
             isMoodDraggedRef.current = true;
+            if (!isMoodDragging) setIsMoodDragging(true);
         }
 
         if (moodTrackRef.current) {
@@ -90,6 +96,9 @@ const Home = () => {
     }, []);
 
     const handleMoodEnd = () => {
+        if (moodTrackRef.current) {
+            moodTrackRef.current._isMouseDown = false;
+        }
         setIsMoodDragging(false);
         setIsMoodTransitioning(true);
         const threshold = 50;
@@ -201,20 +210,32 @@ const Home = () => {
     const dragOffsetRef = useRef(0);
 
     const handleTouchStart = (e) => {
-        setIsDragging(true);
+        // Don't set setIsDragging(true) yet
         setStartX(e.touches ? e.touches[0].pageX : e.pageX);
-        setIsTransitioning(false); // Ngắt hiệu ứng khi đang kéo
+        setIsTransitioning(false);
+        if (trackRef.current) {
+            trackRef.current._isMouseDown = true;
+        }
     };
 
     const handleMouseLeave = () => {
+        if (trackRef.current) {
+            trackRef.current._isMouseDown = false;
+        }
         if (isDragging) handleDragEnd();
     };
 
     const handleTouchMove = (e) => {
-        if (!isDragging) return;
+        if (!trackRef.current?._isMouseDown) return;
+
         const currentX = e.touches ? e.touches[0].pageX : e.pageX;
         const walk = currentX - startX;
         dragOffsetRef.current = walk;
+
+        // Set dragging state only if moved
+        if (Math.abs(walk) > 5) {
+            if (!isDragging) setIsDragging(true);
+        }
 
         // Update CSS variable directly via DOM for 60fps performance
         if (trackRef.current) {
@@ -223,6 +244,9 @@ const Home = () => {
     };
 
     const handleDragEnd = () => {
+        if (trackRef.current) {
+            trackRef.current._isMouseDown = false;
+        }
         setIsDragging(false);
         setIsTransitioning(true);
 
@@ -241,18 +265,16 @@ const Home = () => {
 
     // Vòng lặp tĩnh ngầm (Reset Infinite Loop không có Transition sau 0.5s)
     useEffect(() => {
-        if (featuredBooks.length === 0) return;
+        if (featuredBooks.length <= 1) return; // Không cần loop khi chỉ có 1 sách
         const total = featuredBooks.length;
 
         let timer;
         if (currentIndex < numClones) {
-            // Đã vuốt lấn sang vùng chứa clone nằm bên trái -> trả về thẻ thật tương ứng bên phải
             timer = setTimeout(() => {
                 setIsTransitioning(false);
                 setCurrentIndex(currentIndex + total);
-            }, 500); // 500ms là thời gian CSS Transition
+            }, 500);
         } else if (currentIndex >= total + numClones) {
-            // Đã vuốt lấn sang vùng clone đuôi bên phải -> trả về thẻ thật bên trái
             timer = setTimeout(() => {
                 setIsTransitioning(false);
                 setCurrentIndex(currentIndex - total);
@@ -261,16 +283,19 @@ const Home = () => {
         return () => clearTimeout(timer);
     }, [currentIndex, featuredBooks.length]);
 
-    const trackStyle = {
-        transform: `translateX(calc(var(--actual-card-width) / -2 - ${currentIndex} * (var(--actual-card-width) + var(--card-gap)) + var(--drag-offset, 0px)))`,
-        transition: isTransitioning ? 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1)' : 'none',
-    };
+    const trackStyle = featuredBooks.length <= 1
+        ? { transform: 'translateX(0)', transition: 'none' }
+        : {
+            transform: `translateX(calc(var(--actual-card-width) / -2 - ${currentIndex} * (var(--actual-card-width) + var(--card-gap)) + var(--drag-offset, 0px)))`,
+            transition: isTransitioning ? 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1)' : 'none',
+        };
 
     // Hàm tạo mảng có 2 clones mỗi đầu 
     const extendedBooks = React.useMemo(() => {
         if (featuredBooks.length === 0) return [];
         const books = featuredBooks;
         const n = books.length;
+        // Nếu chỉ có 1 sách: trả về nguyên 1 cuốn, không clone
         if (n === 1) return [{ ...books[0], _loopId: 'real-0' }];
 
         const cloneBefore2 = books[(n - 2 % n + n) % n];
@@ -288,21 +313,24 @@ const Home = () => {
     }, [featuredBooks]);
 
     // Hiển thị ảnh tác giả: Ưu tiên ảnh từ DB, nếu không có mới dùng 2D Illustrations
+    // Switch to ui-avatars as a more stable alternative if DiceBear is reset by network
     const getAuthorImg = (authorData, index) => {
-        // authorData có thể là object { authorName, authorImage } hoặc chỉ là string (tên)
         const name = typeof authorData === 'string' ? authorData : authorData?.authorName;
         const img = typeof authorData === 'object' ? authorData?.authorImage : null;
 
-        // Nếu có ảnh thật (từ DB hoặc Link tuyệt đối)
         if (img && img.startsWith('http')) {
             return img;
         }
 
-        // Nếu không có ảnh, dùng DiceBear API để tạo avatar 2D nghệ thuật và ổn định dựa trên tên
-        // Sử dụng style 'avataaars' hoặc 'adventurer' để có giao diện 2D cao cấp
-        const seed = name || `author-${index}`;
-        return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+        // Switch to ui-avatars as default to avoid ERR_CONNECTION_RESET from DiceBear
+        return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=random&color=fff&size=128`;
     };
+
+    const handleAvatarError = (e, name) => {
+        e.target.onerror = null; // Ngăn lặp vô tận
+        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=random&color=fff`;
+    };
+
 
     useEffect(() => {
         const fetchHomeData = async () => {
@@ -388,7 +416,12 @@ const Home = () => {
 
     if (loading) return <div className="loading">Đang tải dữ liệu…</div>;
 
-    const getBookImg = (path) => path ? `http://localhost:8080/images/${path.split('/').pop()}` : 'https://via.placeholder.com/200x300?text=No+Cover';
+    const getBookImg = (path) => {
+        if (!path) return 'https://via.placeholder.com/200x300?text=No+Cover';
+        if (path.startsWith('http')) return path;
+        if (path.startsWith('/images/')) return `http://localhost:8080${path}`;
+        return `http://localhost:8080/images/${path.split('/').pop()}`;
+    };
 
     const handleAddToCart = async (book, e) => {
         if (e) e.preventDefault();
@@ -487,7 +520,7 @@ const Home = () => {
                                         onTouchEnd={handleDragEnd}
                                     >
                                         {extendedBooks.map((book, idx) => (
-                                            <div className={`spotlight-card-new ${idx === currentIndex ? 'active-slide' : ''}`} key={book._loopId}>
+                                            <div className={`spotlight-card-new ${(featuredBooks.length <= 1 && idx === 0) || idx === currentIndex ? 'active-slide' : ''}`} key={book._loopId}>
                                                 <div className="spotlight-img-column">
                                                     <Link to={`/book/${book.id}`} className="img-container-new">
                                                         <img
@@ -497,18 +530,12 @@ const Home = () => {
                                                             height="450"
                                                         />
                                                         {/* Badge Nguồn gốc */}
-                                                        <div className={`source-tag ${book.bookSource?.toLowerCase() || 'official'}`}>
-                                                            {book.bookSource === 'AUTHOR' ? 'Author' : 'Official'}
-                                                        </div>
+                                                        <SourceTag bookSource={book.bookSource} />
                                                     </Link>
                                                 </div>
                                                 <div className="spotlight-content-column">
                                                     <div className="content-top-row">
                                                         <span className="badge-category-new">{book.category?.name || 'Văn học'}</span>
-                                                        <div className="book-rating-new">
-                                                            <span className="stars-new">★★★★★</span>
-                                                            <span className="rating-count-new">(459)</span>
-                                                        </div>
                                                     </div>
                                                     <Link to={`/book/${book.id}`} className="book-link-reset">
                                                         <h4 className="book-title-new">{book.title}</h4>
@@ -518,6 +545,7 @@ const Home = () => {
                                                             <img
                                                                 src={getAuthorImg(topAuthors.find(a => a.authorName === book.author) || book.author, idx)}
                                                                 alt={book.author}
+                                                                onError={(e) => handleAvatarError(e, book.author)}
                                                             />
                                                         </div>
                                                         <span className="author-name-new">
@@ -534,23 +562,50 @@ const Home = () => {
                                                     <div className="stock-container-new">
                                                         <span className="stock-text-new tabular-nums">{book.quantity || 0} Books In Stock</span>
                                                     </div>
+                                                    <div className="book-rating-new">
+                                                        <span className="stars-new">
+                                                            {[1, 2, 3, 4, 5].map(s => (
+                                                                <span key={s} style={{ color: s <= Math.round(book.averageRating || 0) ? '#f59e0b' : '#cbd5e1' }}>★</span>
+                                                            ))}
+                                                        </span>
+                                                        <span className="rating-score-simple">{(book.averageRating || 0).toFixed(1)}</span>
+                                                        <span className="rating-count-new">({book.reviewCount || 0} đánh giá)</span>
+                                                    </div>
                                                     <div className="spotlight-actions-new">
-                                                        <button className="q-view-btn-spotlight" onClick={() => setQuickViewBook(book)}>Xem nhanh</button>
-                                                        <button 
-                                                            className={`wishlist-btn-round-new ${isInWishlist(book.id) ? 'active' : ''}`} 
-                                                            aria-label="Thêm vào yêu thích" 
+                                                        <button
+                                                            className="q-view-btn-spotlight"
+                                                            aria-haspopup="dialog"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                e.preventDefault();
+                                                                setQuickViewBook(book);
+                                                            }}
+                                                        >
+                                                            Xem nhanh
+                                                        </button>
+                                                        <button
+                                                            className={`wishlist-btn-round-new ${isInWishlist(book.id) ? 'active' : ''}`}
+                                                            aria-label="Thêm vào yêu thích"
                                                             title={isInWishlist(book.id) ? "Xóa khỏi yêu thích" : "Yêu thích"}
-                                                            onClick={() => toggleWishlist(book)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                e.preventDefault();
+                                                                toggleWishlist(book);
+                                                            }}
                                                         >
                                                             <span className="heart-icon-new">{isInWishlist(book.id) ? '❤️' : '🤍'}</span>
                                                         </button>
-                                                        <button 
-                                                            className="cart-btn-round-new" 
-                                                            aria-label={`Thêm ${book.title} vào giỏ hàng`} 
+                                                        <button
+                                                            className="cart-btn-round-new"
+                                                            aria-label={`Thêm ${book.title} vào giỏ hàng`}
                                                             title="Thêm vào giỏ hàng"
-                                                            onClick={(e) => handleAddToCart(book, e)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                e.preventDefault();
+                                                                handleAddToCart(book, e);
+                                                            }}
                                                         >
-                                                            <span className="cart-icon-new">🛒</span>
+                                                            <span className="cart-icon-new" aria-hidden="true">🛒</span>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -670,20 +725,24 @@ const Home = () => {
                                 <div key={book.id} className="mood-book-card">
                                     <div className="m-card-top">
                                         <Link to={`/book/${book.id}`} className="m-book-img">
-                                            <img src={getBookImg(book.imagePath)} alt={book.title} />
+                                            <img src={getBookImg(book.imagePath)} alt={book.title} loading="lazy" />
                                             <div className="m-badges">
                                                 {book.isOnSale && <span className="m-badge-sale">-{Math.round((1 - book.discountPrice / book.price) * 100)}%</span>}
-                                                <div className={`source-tag ${book.bookSource?.toLowerCase() || 'official'}`}>
-                                                    {book.bookSource === 'AUTHOR' ? 'Author' : 'Official'}
-                                                </div>
                                             </div>
                                             <div className="m-overlay-actions">
-                                                <button className="q-view-btn-small" onClick={(e) => {
-                                                    e.preventDefault(); // Fixed: Prevent background Link navigation
-                                                    e.stopPropagation(); // Fixed: Prevent event bubbling
-                                                    setQuickViewBook(book);
-                                                }}>Xem nhanh</button>
+                                                <button
+                                                    className="q-view-btn-small"
+                                                    aria-haspopup="dialog"
+                                                    onClick={(e) => {
+                                                        e.preventDefault(); // Fixed: Prevent background Link navigation
+                                                        e.stopPropagation(); // Fixed: Prevent event bubbling
+                                                        setQuickViewBook(book);
+                                                    }}
+                                                >
+                                                    Xem nhanh
+                                                </button>
                                             </div>
+                                            <SourceTag bookSource={book.bookSource} />
                                         </Link>
                                     </div>
                                     <div className="m-card-body">
@@ -692,10 +751,12 @@ const Home = () => {
                                             <h5 className="m-title">{book.title}</h5>
                                         </Link>
                                         <div className="m-author-minimal">
-                                            <img 
-                                                src={getAuthorImg(book.author, idx)} 
-                                                alt={book.author} 
+                                            <img
+                                                src={getAuthorImg(book.author, idx)}
+                                                alt={book.author}
                                                 className="m-author-avatar-tiny"
+                                                onError={(e) => handleAvatarError(e, book.author)}
+                                                loading="lazy"
                                             />
                                             <span>{book.author}</span>
                                         </div>
@@ -719,14 +780,20 @@ const Home = () => {
                                             </div>
                                         </div>
                                         <div className="m-action-row">
-                                            <button 
+                                            <button
                                                 className="m-add-cart-btn"
-                                                onClick={() => handleAddToCart(book)}
+                                                aria-label={`Thêm ${book.title} vào giỏ hàng`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    e.preventDefault();
+                                                    handleAddToCart(book);
+                                                }}
                                             >
                                                 Thêm vào giỏ
                                             </button>
-                                            <button 
+                                            <button
                                                 className={`m-wishlist-btn ${isInWishlist(book.id) ? 'active' : ''}`}
+                                                aria-label={isInWishlist(book.id) ? "Xóa khỏi danh sách yêu thích" : "Thêm vào danh sách yêu thích"}
                                                 onClick={(e) => {
                                                     e.preventDefault();
                                                     e.stopPropagation();
@@ -734,7 +801,7 @@ const Home = () => {
                                                 }}
                                                 title="Yêu thích"
                                             >
-                                                {isInWishlist(book.id) ? '❤️' : '🤍'}
+                                                <span aria-hidden="true">{isInWishlist(book.id) ? '❤️' : '🤍'}</span>
                                             </button>
                                         </div>
                                     </div>
@@ -777,18 +844,15 @@ const Home = () => {
                                 {books.length > 0 ? books.map((book) => (
                                     <div key={book.id} className="book-card-item-wrapper">
                                         <div className="book-card-alt">
-                                                <Link to={`/book/${book.id}`} className="book-image-container">
-                                                    <img
-                                                        className="main-book-cover"
-                                                        src={getBookImg(book.imagePath)}
-                                                        alt={book.title}
-                                                        loading="lazy"
-                                                        width="200"
-                                                        height="300"
-                                                    />
-                                                <div className={`source-tag ${book.bookSource?.toLowerCase() || 'official'}`}>
-                                                    {book.bookSource === 'AUTHOR' ? 'Author' : 'Official'}
-                                                </div>
+                                            <Link to={`/book/${book.id}`} className="book-image-container">
+                                                <img
+                                                    className="main-book-cover"
+                                                    src={getBookImg(book.imagePath)}
+                                                    alt={book.title}
+                                                    loading="lazy"
+                                                    width="200"
+                                                    height="300"
+                                                />
                                                 <div className="add-to-cart-overlay">
                                                     <button className="q-view-btn" onClick={(e) => {
                                                         e.preventDefault(); // Fixed: Prevent Link navigation
@@ -796,6 +860,7 @@ const Home = () => {
                                                         setQuickViewBook(book);
                                                     }}>Xem nhanh</button>
                                                 </div>
+                                                <SourceTag bookSource={book.bookSource} />
                                             </Link>
                                             <div className="book-info-centered">
                                                 <Link to={`/book/${book.id}`} className="book-link-reset">
@@ -807,7 +872,7 @@ const Home = () => {
                                                 </p>
                                                 <p className="price">{book.price?.toLocaleString()} VNĐ</p>
                                                 <div className="book-action-row">
-                                                    <button 
+                                                    <button
                                                         className="add-to-cart-btn-simple"
                                                         onClick={(e) => {
                                                             e.preventDefault();
@@ -817,8 +882,8 @@ const Home = () => {
                                                     >
                                                         THÊM GIỎ HÀNG
                                                     </button>
-                                                    <button 
-                                                        className={`wishlist-btn-simple ${isInWishlist(book.id) ? 'active' : ''}`} 
+                                                    <button
+                                                        className={`wishlist-btn-simple ${isInWishlist(book.id) ? 'active' : ''}`}
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             e.stopPropagation();
@@ -885,7 +950,12 @@ const Home = () => {
                                     <div className="stars-row">★★★★★</div>
                                     <p>"{item.comment}"</p>
                                     <div className="spotlight-user">
-                                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${item.name}`} alt={item.name} />
+                                        <img
+                                            src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${item.name}`}
+                                            alt={item.name}
+                                            onError={(e) => handleAvatarError(e, item.name)}
+                                            loading="lazy"
+                                        />
                                         <div className="user-text">
                                             <strong>{item.name}</strong>
                                             <span>{item.role}</span>
@@ -968,9 +1038,9 @@ const Home = () => {
             </section>
 
             {/* Quick View Modal Dùng Chung */}
-            <QuickViewModal 
-                book={quickViewBook} 
-                onClose={() => setQuickViewBook(null)} 
+            <QuickViewModal
+                book={quickViewBook}
+                onClose={() => setQuickViewBook(null)}
             />
         </div >
     );

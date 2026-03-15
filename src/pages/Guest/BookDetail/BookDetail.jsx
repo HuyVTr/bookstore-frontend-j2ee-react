@@ -6,6 +6,7 @@ import { useWishlist } from '../../../context/WishlistContext';
 import LoginPromptModal from '../../../components/LoginPromptModal/LoginPromptModal';
 import ReviewSection from '../../../components/Review/ReviewSection';
 import './BookDetail.css';
+import SourceTag from '../../../components/SourceTag/SourceTag';
 
 const BookDetail = () => {
     const { id } = useParams();
@@ -33,7 +34,7 @@ const BookDetail = () => {
                 const res = await api.get(`public/books/${id}`);
                 setBook(res.data);
                 setSelectedImage(res.data?.imagePath);
-                
+
                 // Fetch related books based on category
                 if (res.data?.category?.name) {
                     const relatedRes = await api.get('public/books', {
@@ -91,8 +92,8 @@ const BookDetail = () => {
         }
     };
 
-    const avgRating = reviews.length > 0 
-        ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) 
+    const avgRating = reviews.length > 0
+        ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
         : 0;
 
     const renderStars = (rating) => {
@@ -109,6 +110,7 @@ const BookDetail = () => {
     const getBookImg = (path) => {
         if (!path) return 'https://via.placeholder.com/600x800?text=No+Cover';
         if (path.startsWith('http')) return path;
+        if (path.startsWith('/images/')) return `http://localhost:8080${path}`;
         return `http://localhost:8080/images/${path.split('/').pop()}`;
     };
 
@@ -124,7 +126,7 @@ const BookDetail = () => {
             setShowLoginPrompt(true);
             return;
         }
-        
+
         const result = await addToCart(book, quantity);
         if (!result.success && result.error === 'unauthorized') {
             setShowLoginPrompt(true);
@@ -153,7 +155,7 @@ const BookDetail = () => {
             <p>Đang tải thông tin sách...</p>
         </div>
     );
-    
+
     if (!book) return (
         <div className="error-container">
             <h2>Hic! Không tìm thấy cuốn sách này.</h2>
@@ -178,27 +180,25 @@ const BookDetail = () => {
                 {/* Left: Product Media */}
                 <div className="book-media">
                     <div className="main-image-wrapper glass">
-                        <img 
-                            src={getBookImg(selectedImage || book.imagePath)} 
-                            alt={book.title} 
+                        <img
+                            src={getBookImg(selectedImage || book.imagePath)}
+                            alt={book.title}
                             className="magnify-img"
                         />
-                        <div className={`source-tag ${book.bookSource?.toLowerCase() || 'official'}`}>
-                            {book.bookSource === 'AUTHOR' ? 'Author' : 'Official'}
-                        </div>
+                        <SourceTag bookSource={book.bookSource} />
                     </div>
 
                     {book.subImages && book.subImages.length > 0 && (
                         <div className="sub-images-gallery">
-                            <div 
+                            <div
                                 className={`sub-image-item ${selectedImage === book.imagePath ? 'active' : ''}`}
                                 onClick={() => setSelectedImage(book.imagePath)}
                             >
                                 <img src={getBookImg(book.imagePath)} alt="thumbnail-main" />
                             </div>
                             {book.subImages.map((img, idx) => (
-                                <div 
-                                    key={idx} 
+                                <div
+                                    key={idx}
                                     className={`sub-image-item ${selectedImage === img.imagePath ? 'active' : ''}`}
                                     onClick={() => setSelectedImage(img.imagePath)}
                                 >
@@ -213,14 +213,14 @@ const BookDetail = () => {
                 <div className="book-info">
                     <div className="category-label">{book.category?.name || 'Văn học'}</div>
                     <h1 className="book-title">{book.title}</h1>
-                    
+
                     <div className="author-row">
                         <span>Tác giả: <b>{book.author}</b></span>
                         <span className="divider">|</span>
                         <span>Đã bán: <b>{book.totalSold || 0}</b></span>
                         <span className="divider">|</span>
                         <div className="stars">
-                            {renderStars(avgRating)} 
+                            {renderStars(avgRating)}
                             <small> ({reviews.length} đánh giá)</small>
                         </div>
                     </div>
@@ -238,8 +238,8 @@ const BookDetail = () => {
                     </div>
 
                     <p className="short-description">
-                        Cuốn sách này mang đến cho bạn những góc nhìn mới mẻ và đầy cảm hứng. 
-                        Với nội dung sâu sắc được chắt lọc kỹ lưỡng, đây là người bạn đồng hành 
+                        Cuốn sách này mang đến cho bạn những góc nhìn mới mẻ và đầy cảm hứng.
+                        Với nội dung sâu sắc được chắt lọc kỹ lưỡng, đây là người bạn đồng hành
                         không thể thiếu trên hành trình khám phá tri thức của mỗi chúng ta.
                     </p>
 
@@ -254,15 +254,15 @@ const BookDetail = () => {
                             <input type="number" value={quantity} readOnly />
                             <button onClick={() => handleQuantityChange(1)} disabled={quantity >= book.quantity}>+</button>
                         </div>
-                        <button 
-                            className="add-to-cart-btn" 
+                        <button
+                            className="add-to-cart-btn"
                             disabled={book.quantity <= 0}
                             onClick={handleAddToCart}
                         >
                             THÊM VÀO GIỎ
                         </button>
-                        <button 
-                            className="buy-now-btn" 
+                        <button
+                            className="buy-now-btn"
                             disabled={book.quantity <= 0}
                             onClick={handleBuyNow}
                         >
@@ -271,8 +271,8 @@ const BookDetail = () => {
                     </div>
 
                     <div className="book-extras">
-                        <button 
-                            className={`extra-item ${isInWishlist(book.id) ? 'active' : ''}`} 
+                        <button
+                            className={`extra-item ${isInWishlist(book.id) ? 'active' : ''}`}
                             onClick={handleWishlist}
                         >
                             <span style={{ fontSize: '1.2rem', marginRight: '8px' }}>
@@ -316,20 +316,20 @@ const BookDetail = () => {
             {/* Tabs Section */}
             <div className="book-tabs">
                 <div className="tab-headers">
-                    <button 
-                        className={activeTab === 'description' ? 'active' : ''} 
+                    <button
+                        className={activeTab === 'description' ? 'active' : ''}
                         onClick={() => setActiveTab('description')}
                     >
                         Mô tả chi tiết
                     </button>
-                    <button 
-                        className={activeTab === 'info' ? 'active' : ''} 
+                    <button
+                        className={activeTab === 'info' ? 'active' : ''}
                         onClick={() => setActiveTab('info')}
                     >
                         Thông tin bổ sung
                     </button>
-                    <button 
-                        className={activeTab === 'reviews' ? 'active' : ''} 
+                    <button
+                        className={activeTab === 'reviews' ? 'active' : ''}
                         onClick={() => setActiveTab('reviews')}
                     >
                         Đánh giá ({reviews.length})
@@ -401,7 +401,7 @@ const BookDetail = () => {
                     )}
                     {activeTab === 'reviews' && (
                         <div className="tab-pane fade-in">
-                            <ReviewSection 
+                            <ReviewSection
                                 bookId={id}
                                 reviews={reviews}
                                 canReview={canReview}
@@ -416,8 +416,8 @@ const BookDetail = () => {
                 </div>
             </div>
 
-            <LoginPromptModal 
-                isOpen={showLoginPrompt} 
+            <LoginPromptModal
+                isOpen={showLoginPrompt}
                 onClose={() => setShowLoginPrompt(false)}
                 onConfirm={() => navigate('/login')}
                 message={promptMessage}
@@ -431,7 +431,7 @@ const BookDetail = () => {
                         {relatedBooks.map(b => (
                             <Link to={`/book/${b.id}`} key={b.id} className="related-card-alt glass">
                                 <div className="related-img">
-                                    <img src={getBookImg(b.imagePath)} alt={b.title} />
+                                    <img src={getBookImg(b.imagePath)} alt={b.title} loading="lazy" />
                                 </div>
                                 <div className="related-details">
                                     <h4>{b.title}</h4>

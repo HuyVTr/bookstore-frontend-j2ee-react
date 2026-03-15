@@ -13,13 +13,24 @@ export const useWishlist = () => {
 export const WishlistProvider = ({ children }) => {
     const [wishlist, setWishlist] = useState([]);
     const [notification, setNotification] = useState({ show: false, book: null, type: 'add' });
+    const username = localStorage.getItem('username');
 
+    // Tải wishlist khi username thay đổi (login/logout)
     useEffect(() => {
-        const savedWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-        setWishlist(savedWishlist);
-    }, []);
+        if (username) {
+            const savedWishlist = JSON.parse(localStorage.getItem(`wishlist_${username}`) || '[]');
+            setWishlist(savedWishlist);
+        } else {
+            setWishlist([]); // Clear if logged out
+        }
+    }, [username]);
 
     const toggleWishlist = (book) => {
+        if (!username) {
+            alert("Vui lòng đăng nhập để lưu vào danh sách yêu thích.");
+            return;
+        }
+
         const isExist = wishlist.find(item => item.id === book.id);
         let updatedWishlist;
 
@@ -40,7 +51,7 @@ export const WishlistProvider = ({ children }) => {
         }
 
         setWishlist(updatedWishlist);
-        localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+        localStorage.setItem(`wishlist_${username}`, JSON.stringify(updatedWishlist));
 
         // Auto hide notification
         setTimeout(() => {

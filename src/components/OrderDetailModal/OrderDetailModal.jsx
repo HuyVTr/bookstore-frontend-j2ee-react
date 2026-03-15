@@ -92,9 +92,11 @@ const OrderDetailModal = ({ isOpen, order, onClose, onExportInvoice }) => {
                             {order.orderDetails?.map((detail, idx) => (
                                 <div key={idx} className="item-row-detail">
                                     <div className="item-img">
-                                        <img 
-                                            src={`http://localhost:8080/images/${detail.book?.imagePath?.split('/').pop()}`} 
-                                            alt={detail.book?.title || "Sách"} 
+                                        <img
+                                            src={!detail.book?.imagePath ? 'https://via.placeholder.com/60x80' : 
+                                                 detail.book.imagePath.startsWith('/images/') ? `http://localhost:8080${detail.book.imagePath}` : 
+                                                 `http://localhost:8080/images/${detail.book.imagePath.split('/').pop()}`}
+                                            alt={detail.book?.title || "Sách"}
                                             width="50"
                                             height="75"
                                         />

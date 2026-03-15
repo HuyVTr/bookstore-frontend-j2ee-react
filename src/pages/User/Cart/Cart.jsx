@@ -32,7 +32,7 @@ const Cart = () => {
     };
 
     const handleSelectItem = (id) => {
-        setSelectedIds(prev => 
+        setSelectedIds(prev =>
             prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
         );
     };
@@ -87,6 +87,7 @@ const Cart = () => {
     const getBookImg = (path) => {
         if (!path) return 'https://via.placeholder.com/150x200?text=No+Cover';
         if (path.startsWith('http')) return path;
+        if (path.startsWith('/images/')) return `http://localhost:8080${path}`;
         return `http://localhost:8080/images/${path.split('/').pop()}`;
     };
 
@@ -129,8 +130,8 @@ const Cart = () => {
                     <div className="items-list glass-premium fade-in">
                         <div className="cart-list-header-luxury">
                             <label className="select-all-label">
-                                <div 
-                                    className={`luxury-checkbox ${isAllSelected ? 'checked' : ''}`} 
+                                <div
+                                    className={`luxury-checkbox ${isAllSelected ? 'checked' : ''}`}
                                     onClick={handleSelectAll}
                                     role="checkbox"
                                     aria-checked={isAllSelected}
@@ -148,8 +149,8 @@ const Cart = () => {
                             const isSelected = selectedIds.includes(itemId);
                             return (
                                 <div key={itemId || `item-${idx}`} className={`cart-item slide-up ${isSelected ? 'selected' : ''}`} style={{ animationDelay: `${idx * 0.1}s` }}>
-                                    <div 
-                                        className={`luxury-checkbox ${isSelected ? 'checked' : ''}`} 
+                                    <div
+                                        className={`luxury-checkbox ${isSelected ? 'checked' : ''}`}
                                         onClick={() => handleSelectItem(itemId)}
                                         role="checkbox"
                                         aria-checked={isSelected}
@@ -169,8 +170,8 @@ const Cart = () => {
                                     </div>
                                     <div className="item-quantity">
                                         <div className="qty-controls-luxury">
-                                            <button 
-                                                onClick={() => handleUpdateQuantity(itemId, item.quantity - 1)} 
+                                            <button
+                                                onClick={() => handleUpdateQuantity(itemId, item.quantity - 1)}
                                                 disabled={item.quantity <= 1}
                                                 className="qty-btn"
                                                 aria-label="Giảm số lượng"
@@ -178,8 +179,8 @@ const Cart = () => {
                                                 <Icons.Minus />
                                             </button>
                                             <span className="qty-value tabular-nums">{item.quantity}</span>
-                                            <button 
-                                                onClick={() => handleUpdateQuantity(itemId, item.quantity + 1)} 
+                                            <button
+                                                onClick={() => handleUpdateQuantity(itemId, item.quantity + 1)}
                                                 className="qty-btn"
                                                 aria-label="Tăng số lượng"
                                             >
@@ -192,8 +193,8 @@ const Cart = () => {
                                             {formatCurrency(item.price * item.quantity)}
                                         </span>
                                     </div>
-                                    <button 
-                                        className="remove-item-btn-premium" 
+                                    <button
+                                        className="remove-item-btn-premium"
                                         onClick={() => handleRemoveItem(itemId)}
                                         aria-label="Xóa sản phẩm"
                                     >
@@ -203,7 +204,7 @@ const Cart = () => {
                             );
                         })}
                     </div>
-                    
+
                     <div className="cart-footer-actions">
                         <Link to="/shop" className="back-to-shop">← Tiếp tục mua sắm</Link>
                         <button className="clear-cart-btn" onClick={handleClearCart}>Xóa giỏ hàng</button>
@@ -226,14 +227,14 @@ const Cart = () => {
                             <span>Tổng cộng:</span>
                             <span className="tabular-nums">{formatCurrency(selectedTotalPrice)}</span>
                         </div>
-                        <button 
+                        <button
                             className="checkout-btn hover-lift"
                             onClick={() => navigate('/checkout', { state: { selectedIds } })}
                             disabled={selectedIds.length === 0}
                         >
                             TIẾN HÀNH THANH TOÁN
                         </button>
-                        
+
                         <div className="trust-badges">
                             <div className="badge-item">
                                 <Icons.Secure /> <span>Bảo mật 100%</span>
@@ -256,14 +257,14 @@ const Cart = () => {
                         <h2 className="modal-title">{confirmAction.title}</h2>
                         <p className="modal-message">{confirmAction.message}</p>
                         <div className="modal-actions">
-                            <button 
-                                className="btn-modal-cancel" 
+                            <button
+                                className="btn-modal-cancel"
                                 onClick={() => setConfirmAction({ show: false, type: '', data: null })}
                             >
                                 Quay lại
                             </button>
-                            <button 
-                                className="btn-modal-confirm" 
+                            <button
+                                className="btn-modal-confirm"
                                 onClick={() => {
                                     if (confirmAction.type === 'REMOVE_ITEM') confirmRemoveItem(confirmAction.data.id);
                                     if (confirmAction.type === 'CLEAR_CART') confirmClearCart();

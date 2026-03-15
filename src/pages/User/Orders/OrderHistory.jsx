@@ -39,7 +39,7 @@ const OrderHistory = () => {
     const [reviewModalData, setReviewModalData] = useState({ isOpen: false, book: null });
     const [cancelModal, setCancelModal] = useState({ isOpen: false, orderId: null, loading: false });
     const [exportModal, setExportModal] = useState({ isOpen: false, orderId: null });
-    const [reviewedItems, setReviewedItems] = useState(new Set()); 
+    const [reviewedItems, setReviewedItems] = useState(new Set());
     const [statusModal, setStatusModal] = useState({ isOpen: false, type: 'success', title: '', message: '' });
     const [detailModal, setDetailModal] = useState({ isOpen: false, order: null });
     const navigate = useNavigate();
@@ -104,7 +104,7 @@ const OrderHistory = () => {
         const { orderId } = exportModal;
         const token = localStorage.getItem('token');
         let endpoint = `orders/${orderId}/invoice`;
-        
+
         if (format === 'PDF') endpoint += '/pdf';
         else if (format === 'EXCEL') endpoint += '/excel';
 
@@ -131,10 +131,10 @@ const OrderHistory = () => {
     };
 
     const getBookImg = (path) => {
-        if (!path) return 'https://via.placeholder.com/150?text=Book';
+        if (!path) return 'https://via.placeholder.com/80x120?text=No+Cover';
         if (path.startsWith('http')) return path;
-        const fileName = path.split('/').pop();
-        return `http://localhost:8080/images/${fileName}`;
+        if (path.startsWith('/images/')) return `http://localhost:8080${path}`;
+        return `http://localhost:8080/images/${path.split('/').pop()}`;
     };
 
     if (loading) return (
@@ -194,8 +194,8 @@ const OrderHistory = () => {
                                         {order.orderDetails?.map((detail, dIdx) => (
                                             <div key={detail.id || dIdx} className="order-item-row">
                                                 <div className="item-img-container">
-                                                    <img 
-                                                        src={getBookImg(detail.book?.imagePath)} 
+                                                    <img
+                                                        src={getBookImg(detail.book?.imagePath)}
                                                         alt={detail.book?.title}
                                                         width="60" height="85"
                                                         onError={(e) => { e.target.src = 'https://via.placeholder.com/150?text=No+Image'; }}
@@ -212,19 +212,19 @@ const OrderHistory = () => {
                                                 <div className="item-price-col">
                                                     <span className="unit-price tabular-nums">{formatCurrency(detail.price * detail.quantity)}</span>
                                                     <div className="item-actions-stack">
-                                                        <button 
+                                                        <button
                                                             className="btn-item-detail"
                                                             onClick={() => navigate(`/book/${detail.book?.id}`)}
                                                         >
                                                             <Icons.Eye /> Chi tiết
                                                         </button>
-                                                        
+
                                                         {order.status === 'COMPLETED' && detail.book && (
                                                             <div className="rate-action-container">
-                                                                 {reviewedItems.has(detail.book.id) ? (
+                                                                {reviewedItems.has(detail.book.id) ? (
                                                                     <span className="rate-success-badge">Đã đánh giá ✓</span>
                                                                 ) : (
-                                                                    <button 
+                                                                    <button
                                                                         className="btn-rate-item"
                                                                         onClick={() => setReviewModalData({ isOpen: true, book: detail.book })}
                                                                     >
@@ -286,7 +286,7 @@ const OrderHistory = () => {
                                         <button className="action-btn btn-glass" onClick={() => setDetailModal({ isOpen: true, order: order })}>
                                             <Icons.Eye /> Chi tiết đơn hàng
                                         </button>
-                                        
+
                                         {order.status === 'PENDING' && (
                                             <button className="action-btn btn-cancel-neon" onClick={() => setCancelModal({ isOpen: true, orderId: order.id, loading: false })}>
                                                 <Icons.XCircle /> Hủy đơn hàng
@@ -306,9 +306,9 @@ const OrderHistory = () => {
                     </div>
                 )}
             </div>
-            <ReviewModal 
-                isOpen={reviewModalData.isOpen} 
-                book={reviewModalData.book} 
+            <ReviewModal
+                isOpen={reviewModalData.isOpen}
+                book={reviewModalData.book}
                 onClose={() => setReviewModalData({ isOpen: false, book: null })}
                 onSuccess={() => {
                     if (reviewModalData.book) {
@@ -317,7 +317,7 @@ const OrderHistory = () => {
                 }}
             />
 
-            <ConfirmationModal 
+            <ConfirmationModal
                 isOpen={cancelModal.isOpen}
                 title="Xác nhận hủy đơn hàng"
                 message={`Bạn có chắc chắn muốn hủy đơn hàng #LH${cancelModal.orderId?.toString().padStart(4, '0')} không? Thao tác này không thể hoàn tác.`}
@@ -328,7 +328,7 @@ const OrderHistory = () => {
                 onCancel={() => setCancelModal({ isOpen: false, orderId: null, loading: false })}
             />
 
-            <ExportInvoiceModal 
+            <ExportInvoiceModal
                 isOpen={exportModal.isOpen}
                 orderId={exportModal.orderId}
                 onClose={() => setExportModal({ isOpen: false, orderId: null })}
@@ -337,7 +337,7 @@ const OrderHistory = () => {
                 onPrintHtml={() => handleExportInvoiceAction('HTML')}
             />
 
-            <StatusModal 
+            <StatusModal
                 isOpen={statusModal.isOpen}
                 type={statusModal.type}
                 title={statusModal.title}
@@ -346,7 +346,7 @@ const OrderHistory = () => {
                 buttonText="Đóng"
             />
 
-            <OrderDetailModal 
+            <OrderDetailModal
                 isOpen={detailModal.isOpen}
                 order={detailModal.order}
                 onClose={() => setDetailModal({ isOpen: false, order: null })}

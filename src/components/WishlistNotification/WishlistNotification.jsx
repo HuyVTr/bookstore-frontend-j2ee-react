@@ -12,8 +12,9 @@ const WishlistNotification = () => {
     const { book, type } = notification;
 
     const getBookImg = (path) => {
-        if (!path) return 'https://via.placeholder.com/80x120?text=Book';
+        if (!path) return 'https://via.placeholder.com/60x80?text=No+Cover';
         if (path.startsWith('http')) return path;
+        if (path.startsWith('/images/')) return `http://localhost:8080${path}`;
         return `http://localhost:8080/images/${path.split('/').pop()}`;
     };
 
@@ -55,8 +56,8 @@ const WishlistNotification = () => {
 
                 {type === 'add' && (
                     <div className="wn-footer">
-                        <button 
-                            className="wn-view-wishlist-btn" 
+                        <button
+                            className="wn-view-wishlist-btn"
                             onClick={() => {
                                 navigate('/wishlist');
                                 closeNotification();
@@ -66,7 +67,7 @@ const WishlistNotification = () => {
                         </button>
                     </div>
                 )}
-                
+
                 <div className="wn-progress-bar"></div>
             </div>
         </div>

@@ -16,11 +16,25 @@ const Register = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
+    const [allowRegistration, setAllowRegistration] = useState(true);
+    const [showLockedModal, setShowLockedModal] = useState(false);
     const navigate = useNavigate();
 
     const GOOGLE_AUTH_URL = "http://localhost:8080/oauth2/authorization/google";
     const GITHUB_AUTH_URL = "http://localhost:8080/oauth2/authorization/github";
     const FACEBOOK_AUTH_URL = "http://localhost:8080/oauth2/authorization/facebook";
+
+    React.useEffect(() => {
+        const checkRegistrationStatus = async () => {
+            try {
+                const res = await api.get('admin/configs/public');
+                setAllowRegistration(res.data.allowRegistration);
+            } catch (err) {
+                console.error("Lỗi khi kiểm tra trạng thái đăng ký:", err);
+            }
+        };
+        checkRegistrationStatus();
+    }, []);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,6 +42,12 @@ const Register = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault();
+
+        if (!allowRegistration) {
+            setShowLockedModal(true);
+            return;
+        }
+
         setError('');
         setSuccess('');
 
@@ -42,7 +62,6 @@ const Register = () => {
                 username: formData.username,
                 email: formData.email,
                 password: formData.password
-                // Back-end sẽ lo gán role mặc định và Active=true
             });
 
             setSuccess('Đăng ký thành công! Đang chuyển hướng...');
@@ -56,12 +75,33 @@ const Register = () => {
 
     return (
         <div className="login-auth-wrapper register-page-specific">
+            {/* Locked Modal Popup */}
+            {showLockedModal && (
+                <div className="locked-feature-overlay fade-in">
+                    <div className="locked-feature-modal scale-in">
+                        <div className="locked-icon-container">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        </div>
+                        <h3>Chức năng đang tạm khóa</h3>
+                        <p>Hệ thống hiện đang tạm dừng nhận đăng ký thành viên mới để bảo trì và nâng cấp. Rất xin lỗi vì sự bất tiện này!</p>
+                        <button className="locked-modal-btn" onClick={() => setShowLockedModal(false)}>
+                            Tôi đã hiểu
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="form-container-all">
-                {/* Form Side (Left) */}
                 <div className="auth-side-form">
                     <div className="form-container-stitch">
                         <div className="form-header">
                             <h2>Đăng ký</h2>
+                            {!allowRegistration && (
+                                <div className="registration-locked-banner slide-down">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                    <span>Thông báo: Chức năng đăng ký đang tạm khóa</span>
+                                </div>
+                            )}
                             <p>Chào mừng bạn! Hãy tham gia cùng cộng đồng mọt sách ngay.</p>
                         </div>
 

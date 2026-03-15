@@ -351,50 +351,60 @@
 }
 
 /* --- ACTIONS AREA --- */
-.order-actions-bar {
-    padding: 20px 40px 30px;
+.orders-page-container .order-actions-bar {
+    padding: 25px 40px 35px;
     display: flex;
     justify-content: flex-end;
-    gap: 15px;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap; 
 }
 
-.action-btn {
-    padding: 12px 28px;
-    border-radius: 16px;
-    font-weight: 750;
+.orders-page-container .action-btn {
+    padding: 12px 24px;
+    border-radius: 14px;
+    font-weight: 700;
     font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 160px;
+    border: none;
+    outline: none;
 }
 
-.btn-glass {
-    background: white;
-    border: 1.5px solid #e2e8f0;
+.orders-page-container .btn-glass {
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0 !important;
     color: #475569;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
-.btn-glass:hover {
+.orders-page-container .btn-glass:hover {
     background: #f8fafc;
-    border-color: var(--order-accent);
-    color: var(--order-accent);
-    transform: translateY(-2px);
+    border-color: #6366f1 !important;
+    color: #6366f1;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px -5px rgba(99, 102, 241, 0.2);
 }
 
-.btn-cancel-neon {
+.orders-page-container .btn-cancel-neon {
     background: #fff1f2;
-    border: 1.5px solid #fecdd3;
+    border: 1.5px solid #fecdd3 !important;
     color: #e11d48;
 }
 
-.btn-cancel-neon:hover {
-    background: #fb7185;
+.orders-page-container .btn-cancel-neon:hover {
+    background: #e11d48;
     color: white;
-    border-color: #fb7185;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px -4px rgba(225, 29, 72, 0.4);
+    border-color: #e11d48 !important;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.4);
 }
 
 /* --- EMPTY STATE DESIGN --- */
@@ -480,8 +490,17 @@
     }
     .order-item-row { padding: 20px 24px; }
     .order-total-summary { text-align: left; align-items: flex-start; }
-    .order-actions-bar { padding: 0 24px 24px; justify-content: stretch; }
-    .action-btn { flex: 1; justify-content: center; }
+    .order-actions-bar { 
+        padding: 0 24px 24px; 
+        flex-direction: column;
+        justify-content: stretch; 
+        gap: 12px;
+    }
+    .action-btn { 
+        width: 100%;
+        min-width: 0;
+        justify-content: center; 
+    }
 }
 
 /* --- ANIMATIONS --- */

@@ -18,7 +18,10 @@ export const CartProvider = ({ children }) => {
 
     const fetchCart = async () => {
         const token = localStorage.getItem('token');
-        if (!token) return;
+        if (!token) {
+            setCart({ cartItems: [], totalPrice: 0 });
+            return;
+        }
         
         try {
             const res = await api.get('cart');
@@ -30,7 +33,7 @@ export const CartProvider = ({ children }) => {
 
     useEffect(() => {
         fetchCart();
-    }, []);
+    }, [localStorage.getItem('token')]);
 
     const addToCart = async (book, quantity = 1) => {
         const token = localStorage.getItem('token');

@@ -5,6 +5,7 @@ import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import QuickViewModal from '../../components/QuickViewModal/QuickViewModal';
 import './Shop.css';
+import SourceTag from '../../components/SourceTag/SourceTag';
 
 const Shop = () => {
     const [books, setBooks] = useState([]);
@@ -115,6 +116,7 @@ const Shop = () => {
     const getBookImg = (path) => {
         if (!path) return 'https://via.placeholder.com/400x600?text=No+Cover';
         if (path.startsWith('http')) return path;
+        if (path.startsWith('/images/')) return `http://localhost:8080${path}`;
         return `http://localhost:8080/images/${path.split('/').pop()}`;
     };
 
@@ -249,7 +251,7 @@ const Shop = () => {
                                 <div className="promo-inner">
                                     <span className="promo-tag">DEAL NGON</span>
                                     <h4>Săn Deal ngay <br />Đơn hàng đầu tiên</h4>
-                                    <p>Được ưu đãi giảm 20%</p>                           
+                                    <p>Được ưu đãi giảm 20%</p>
                                 </div>
                             </div>
                         </div>
@@ -312,17 +314,17 @@ const Shop = () => {
                                     <div className="premium-book-card" key={book.id}>
                                         <div className="card-top">
                                             <div className="image-frame">
-                                                <img 
-                                                    src={getBookImg(book.imagePath)} 
-                                                    alt={book.title} 
-                                                    width="240" 
-                                                    height="336" 
+                                                <img
+                                                    src={getBookImg(book.imagePath)}
+                                                    alt={book.title}
+                                                    width="240"
+                                                    height="336"
                                                     loading="lazy"
                                                 />
                                                 <div className="card-hover-overlay">
-                                                    <button 
-                                                        className="overlay-btn main cart" 
-                                                        title="Thêm vào giỏ hàng" 
+                                                    <button
+                                                        className="overlay-btn main cart"
+                                                        title="Thêm vào giỏ hàng"
                                                         aria-label="Thêm vào giỏ hàng"
                                                         onClick={() => handleAddToCart(book)}
                                                     >
@@ -333,9 +335,9 @@ const Shop = () => {
                                                     </button>
                                                     <div className="sub-actions">
                                                         {(userRoles.includes('USER') || userRoles.includes('AUTHOR')) && (
-                                                            <button 
-                                                                className={`overlay-btn small ${isInWishlist(book.id) ? 'active' : ''}`} 
-                                                                title={isInWishlist(book.id) ? "Xóa khỏi yêu thích" : "Yêu thích"} 
+                                                            <button
+                                                                className={`overlay-btn small ${isInWishlist(book.id) ? 'active' : ''}`}
+                                                                title={isInWishlist(book.id) ? "Xóa khỏi yêu thích" : "Yêu thích"}
                                                                 aria-label="Thêm vào danh sách yêu thích"
                                                                 onClick={() => toggleWishlist(book)}
                                                             >
@@ -346,9 +348,7 @@ const Shop = () => {
                                                 </div>
                                             </div>
                                             {book.isOnSale && <div className="sale-badge">SALE</div>}
-                                            <div className={`source-tag ${book.bookSource?.toLowerCase() || 'official'}`}>
-                                                {book.bookSource === 'AUTHOR' ? 'Author' : 'Official'}
-                                            </div>
+                                            <SourceTag bookSource={book.bookSource} />
                                         </div>
                                         <div className="card-bottom">
                                             <span className="book-cat-label">{book.category?.name || 'Chưa phân loại'}</span>
@@ -396,9 +396,9 @@ const Shop = () => {
                 </div>
             </div>
             {/* Quick View Modal Dùng Chung */}
-            <QuickViewModal 
-                book={quickViewBook} 
-                onClose={() => setQuickViewBook(null)} 
+            <QuickViewModal
+                book={quickViewBook}
+                onClose={() => setQuickViewBook(null)}
             />
         </div>
     );

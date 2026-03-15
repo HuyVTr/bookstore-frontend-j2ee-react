@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../../assets/logo/logo.jpg';
+import api from '../../services/api';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import './Header.css';
@@ -35,9 +36,13 @@ const Header = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
 
-    
+
     const dropdownRef = useRef(null);
+    const searchRef = useRef(null); // Ref for search container to handle clicks outside
     const cartCount = cart?.cartItems?.length || 0;
     const wishlistCount = wishlist?.length || 0;
 
@@ -45,10 +50,13 @@ const Header = () => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 20);
         };
-        
+
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setIsDropdownOpen(false);
+            }
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setShowSuggestions(false);
             }
         };
 
@@ -73,6 +81,48 @@ const Header = () => {
         };
     }, []);
 
+    // Search Suggestions Logic
+    useEffect(() => {
+        let active = true;
+        const timer = setTimeout(async () => {
+            const query = searchQuery.trim();
+            if (query.length >= 2) {
+                setIsSearching(true);
+                try {
+                    // Dùng endpoint public/books với tham số search (giống Shop page) để đảm bảo kết quả chính xác
+                    const res = await api.get('public/books', {
+                        params: {
+                            search: query,
+                            pageSize: 6,
+                            sortBy: 'popular'
+                        }
+                    });
+
+                    if (active) {
+                        const bookData = res.data.books || [];
+                        setSuggestions(bookData);
+                        setShowSuggestions(true);
+                    }
+                } catch (err) {
+                    console.error("Suggestion error:", err);
+                    if (active) setSuggestions([]);
+                } finally {
+                    if (active) setIsSearching(false);
+                }
+            } else {
+                setSuggestions([]);
+                setShowSuggestions(false);
+            }
+        }, 400); // Tăng debounce một chút để mượt hơn
+
+        return () => {
+            active = false;
+            clearTimeout(timer);
+        };
+    }, [searchQuery]);
+
+
+
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
@@ -89,12 +139,21 @@ const Header = () => {
     };
 
     const handleSearch = (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         if (searchQuery.trim()) {
             navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
             setSearchQuery('');
+            setShowSuggestions(false);
         }
     };
+
+    const getBookImg = (path) => {
+        if (!path) return 'https://via.placeholder.com/40x60?text=No+Cover';
+        if (path.startsWith('http')) return path;
+        if (path.startsWith('/images/')) return `http://localhost:8080${path}`;
+        return `http://localhost:8080/images/${path.split('/').pop()}`;
+    };
+
 
     return (
         <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
@@ -125,8 +184,8 @@ const Header = () => {
 
                 <div className="header-actions">
                     <div className="action-buttons-group">
-                        <button 
-                            className={`hamburger-btn ${isMenuOpen ? 'active' : ''}`} 
+                        <button
+                            className={`hamburger-btn ${isMenuOpen ? 'active' : ''}`}
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             aria-label="Toggle menu"
                         >
@@ -136,21 +195,73 @@ const Header = () => {
                         </button>
 
                         {location.pathname !== '/shop' && (
-                            <form className="search-bar-premium hide-mobile" onSubmit={handleSearch}>
-                                <input 
-                                    type="text" 
-                                    name="q"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Tìm kiếm sách…" 
-                                    aria-label="Tìm kiếm sách"
-                                    autoComplete="off"
-                                />
-                                <button type="submit" className="search-btn-luxury" aria-label="Tìm kiếm">
-                                    <Icons.Search />
-                                </button>
-                            </form>
+                            <div className="search-wrapper-luxury hide-mobile" ref={searchRef}>
+                                <form className="search-bar-premium" onSubmit={handleSearch}>
+                                    <input
+                                        type="text"
+                                        name="q"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        onFocus={() => searchQuery.length >= 2 && setShowSuggestions(true)}
+                                        placeholder="Tìm kiếm sách…"
+                                        aria-label="Tìm kiếm sách"
+                                        autoComplete="off"
+                                    />
+                                    <button type="submit" className="search-btn-luxury" aria-label="Tìm kiếm">
+                                        <Icons.Search />
+                                    </button>
+                                </form>
+
+                                {showSuggestions && (
+                                    <div className="search-suggestions-panel glass-premium fade-in">
+                                        {isSearching ? (
+                                            <div className="suggestion-loading">
+                                                <div className="spinner-tiny"></div>
+                                                <span>Đang tìm kiếm...</span>
+                                            </div>
+                                        ) : suggestions.length > 0 ? (
+                                            <>
+                                                <div className="suggestions-header">Kết quả gợi ý</div>
+                                                <div className="suggestions-list">
+                                                    {suggestions.map((book) => (
+                                                        <div
+                                                            key={book.id}
+                                                            className="suggestion-item"
+                                                            onClick={() => {
+                                                                navigate(`/book/${book.id}`);
+                                                                setShowSuggestions(false);
+                                                                setSearchQuery('');
+                                                            }}
+                                                        >
+                                                            <div className="suggestion-img">
+                                                                <img src={getBookImg(book.imagePath)} alt={book.title} />
+                                                            </div>
+                                                            <div className="suggestion-info">
+                                                                <div className="suggestion-title">{book.title}</div>
+                                                                <div className="suggestion-author">{book.author}</div>
+                                                                <div className="suggestion-price">
+                                                                    {book.isOnSale ? book.discountPrice?.toLocaleString() : book.price?.toLocaleString()} VNĐ
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <div className="suggestions-footer" onClick={handleSearch}>
+                                                    Xem tất cả kết quả cho "{searchQuery}"
+                                                </div>
+                                            </>
+                                        ) : searchQuery.length >= 2 ? (
+                                            <div className="no-suggestions">
+                                                <p>Không tìm thấy kết quả cho "<b>{searchQuery}</b>"</p>
+                                            </div>
+                                        ) : null}
+                                    </div>
+                                )}
+
+
+                            </div>
                         )}
+
 
                         {isLoggedIn && (
                             <>
@@ -177,6 +288,12 @@ const Header = () => {
                                     <div className="dropdown-divider"></div>
                                     <Link to="/profile" className="dropdown-link" onClick={() => setIsDropdownOpen(false)}>Hồ sơ cá nhân</Link>
                                     <Link to="/orders" className="dropdown-link" onClick={() => setIsDropdownOpen(false)}>Lịch sử đơn hàng</Link>
+                                    {Array.isArray(userRole) && (userRole.includes('AUTHOR') || userRole.includes('ROLE_AUTHOR')) && (
+                                        <Link to="/author/dashboard" className="dropdown-link" style={{ color: '#f59e0b', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => setIsDropdownOpen(false)}>
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                            Trung Tâm Tác Giả
+                                        </Link>
+                                    )}
                                     <div className="dropdown-divider"></div>
                                     <button onClick={handleLogout} className="logout-btn-premium">
                                         <Icons.Logout /> Đăng xuất

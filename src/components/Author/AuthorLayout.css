@@ -1,0 +1,25 @@
+.author-console-shell {
+    background: #fdfcfb; /* Slightly warmer white */
+}
+
+.author-top-nav {
+    border-bottom: 1px solid rgba(245, 158, 11, 0.1);
+}
+
+.author-avatar-accent {
+    background: linear-gradient(135deg, #fff7ed, #fee2e2);
+    color: #ea580c;
+    border: 1px solid rgba(234, 88, 12, 0.2);
+    box-shadow: 0 4px 10px rgba(234, 88, 12, 0.15);
+}
+
+.badge-author {
+    color: #ea580c;
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+
+/* Page specific overrides can go here */
+.author-console-shell .staff-main-content {
+    background: #fdfcfb;
+}

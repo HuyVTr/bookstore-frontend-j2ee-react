@@ -1,0 +1,83 @@
+/* AdminLayout.css - Premium Header and Shell Styling */
+
+.admin-shell {
+    background: #f8fafc;
+}
+
+.admin-top-nav {
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0 2rem;
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.admin-top-nav .page-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.admin-top-nav .breadcrumbs {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+}
+
+.admin-top-nav .nav-icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #f1f5f9;
+    background: #f8fafc;
+    color: #64748b;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.admin-top-nav .nav-icon-btn:hover {
+    background: #f1f5f9;
+    color: #6366f1;
+    border-color: #e2e8f0;
+}
+
+.admin-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+.user-profile-trigger {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 12px;
+    transition: background 0.2s;
+}
+
+.user-profile-trigger:hover {
+    background: #f8fafc;
+}
+
+.user-role.badge-administrator {
+    background: #fef2f2;
+    color: #991b1b;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-weight: 700;
+}

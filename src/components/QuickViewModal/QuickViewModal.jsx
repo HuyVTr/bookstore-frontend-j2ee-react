@@ -4,6 +4,7 @@ import api from '../../services/api';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
 import './QuickViewModal.css';
+import SourceTag from '../SourceTag/SourceTag';
 
 const QuickViewModal = ({ book, onClose }) => {
     const navigate = useNavigate();
@@ -44,6 +45,7 @@ const QuickViewModal = ({ book, onClose }) => {
     const getBookImg = (path) => {
         if (!path) return 'https://via.placeholder.com/400x600?text=No+Cover';
         if (path.startsWith('http')) return path;
+        if (path.startsWith('/images/')) return `http://localhost:8080${path}`;
         return `http://localhost:8080/images/${path.split('/').pop()}`;
     };
 
@@ -55,9 +57,9 @@ const QuickViewModal = ({ book, onClose }) => {
                 </button>
                 <div className="qv-body">
                     <div className="qv-image">
-                        <img 
-                            src={getBookImg(book.imagePath)} 
-                            alt={book.title} 
+                        <img
+                            src={getBookImg(book.imagePath)}
+                            alt={book.title}
                             width="400"
                             height="600"
                             loading="eager"
@@ -66,9 +68,7 @@ const QuickViewModal = ({ book, onClose }) => {
                     <div className="qv-details">
                         <div className="qv-header-badge">
                             <span className="qv-category">{book.category?.name || 'Văn học'}</span>
-                            <div className={`source-tag ${book.bookSource?.toLowerCase() || 'official'}`}>
-                                {book.bookSource === 'AUTHOR' ? 'Author' : 'Official'}
-                            </div>
+                            <SourceTag bookSource={book.bookSource} className="inline" />
                         </div>
                         <h2>{book.title}</h2>
                         <p className="qv-author">
@@ -90,15 +90,15 @@ const QuickViewModal = ({ book, onClose }) => {
                             <button className="qv-add-cart" onClick={() => handleAddToCart(book)}>
                                 THÊM VÀO GIỎ
                             </button>
-                            <Link 
-                                to={`/book/${book.id}`} 
-                                className="qv-details-btn" 
+                            <Link
+                                to={`/book/${book.id}`}
+                                className="qv-details-btn"
                                 onClick={onClose}
                             >
                                 XEM CHI TIẾT
                             </Link>
-                            <button 
-                                className={`qv-wishlist ${isInWishlist(book.id) ? 'active' : ''}`} 
+                            <button
+                                className={`qv-wishlist ${isInWishlist(book.id) ? 'active' : ''}`}
                                 onClick={(e) => handleWishlistClick(e, book)}
                                 aria-label="Thêm vào danh sách yêu thích"
                             >

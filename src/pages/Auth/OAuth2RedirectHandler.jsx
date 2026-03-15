@@ -6,18 +6,37 @@ const OAuth2RedirectHandler = () => {
     const location = useLocation();
 
     useEffect(() => {
-        // Lấy token từ URL (Backend gửi về sau khi OAuth hoàn tất)
+        const fetchUserProfile = async (token) => {
+            try {
+                // Thiết lập header tạm thời để gọi profile
+                const res = await api.get('profile', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                // Lưu thông tin từ profile vào localStorage
+                localStorage.setItem('username', res.data.username);
+                localStorage.setItem('roles', JSON.stringify(res.data.roles));
+                
+                // Sau khi lưu xong mọi thứ, mới chuyển hướng và reload
+                navigate('/', { replace: true });
+                window.location.reload(); 
+            } catch (err) {
+                console.error("Lỗi khi tải thông tin user sau OAuth:", err);
+                navigate('/login', {
+                    replace: true,
+                    state: { error: "Không thể tải thông tin người dùng" }
+                });
+            }
+        };
+
         const params = new URLSearchParams(location.search);
         const token = params.get('token');
         const error = params.get('error');
 
         if (token) {
-            // Lưu token vào localStorage
             localStorage.setItem('token', token);
-            // Redirect sang trang chủ
-            navigate('/', { replace: true });
-        } else {
-            // Nếu có lỗi, quay về trang login với thông báo
+            fetchUserProfile(token);
+        } else if (error) {
             navigate('/login', {
                 replace: true,
                 state: { error: error || "Authentication failed" }

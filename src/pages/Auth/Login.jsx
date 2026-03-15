@@ -10,7 +10,23 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [allowRegistration, setAllowRegistration] = useState(true);
     const navigate = useNavigate();
+
+    React.useEffect(() => {
+        const fetchSystemConfig = async () => {
+            try {
+                const res = await api.get('admin/configs/public');
+                setAllowRegistration(res.data.allowRegistration);
+                if (res.data.maintenanceMode) {
+                    setError('Hệ thống hiện đang bảo trì. Bạn không thể đăng nhập lúc này.');
+                }
+            } catch (err) {
+                console.error("Lỗi khi tải cấu hình hệ thống:", err);
+            }
+        };
+        fetchSystemConfig();
+    }, []);
 
     const GOOGLE_AUTH_URL = "http://localhost:8080/oauth2/authorization/google";
     const GITHUB_AUTH_URL = "http://localhost:8080/oauth2/authorization/github";
@@ -32,9 +48,16 @@ const Login = () => {
             localStorage.setItem('username', response.data.username);
             localStorage.setItem('roles', JSON.stringify(response.data.roles));
 
-            // Chuyển hướng về trang chủ
-            navigate('/');
-            window.location.reload(); // Refresh để cập nhật Header
+            // Chuyển hướng theo vai trò
+            const roles = response.data.roles || [];
+            if (roles.includes('ROLE_ADMIN') || roles.includes('ADMIN')) {
+                navigate('/admin/dashboard');
+            } else if (roles.includes('ROLE_STAFF') || roles.includes('STAFF')) {
+                navigate('/staff/dashboard');
+            } else {
+                navigate('/');
+            }
+            window.location.reload(); // Refresh để cập nhật state toàn cục (nếu cần)
         } catch (err) {
             setError(err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
         } finally {
@@ -105,9 +128,15 @@ const Login = () => {
                             </button>
                         </form>
 
-                        <div className="auth-footer">
-                            Chưa có tài khoản? <a href="/register">Đăng ký ngay!</a>
-                        </div>
+                        {allowRegistration ? (
+                            <div className="auth-footer">
+                                Chưa có tài khoản? <a href="/register">Đăng ký ngay!</a>
+                            </div>
+                        ) : (
+                            <div className="auth-footer disabled-notice">
+                                Hiện tại hệ thống đã khóa chức năng đăng ký thành viên mới.
+                            </div>
+                        )}
                     </div>
                 </div>
 
