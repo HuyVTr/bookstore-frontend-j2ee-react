@@ -431,20 +431,20 @@ const UserManagement = () => {
                                                 {user.username}
                                                 {user.isSuperAdmin && <span className="super-badge" title="Super Admin">🛡️</span>}
                                             </span>
-                                            <span className="u-id">ID: #{user.id.toString().padStart(4, '0')}</span>
+                                            <span className="u-id tabular-nums">ID: #{user.id.toString().padStart(4, '0')}</span>
                                         </div>
                                     </div>
                                 </td>
-                                <td>{user.email}</td>
-                                <td>
+                                <td data-label="Email">{user.email}</td>
+                                <td data-label="Nền tảng">
                                     <PlatformBadge platform={user.platform} />
                                 </td>
-                                <td>
+                                <td data-label="Vai trò">
                                     <span className={`badge-role ${user.role?.toLowerCase() || 'user'}`}>
                                         {user.isSuperAdmin ? 'SUPER ADMIN' : (user.role || 'USER')}
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Trạng thái">
                                     <div className="status-pill">
                                         <span className={`status-dot ${user.status?.toLowerCase() || 'active'}`}></span>
                                         <span style={{ fontSize: '0.8rem', color: user.status === 'ACTIVE' ? '#10b981' : '#ef4444' }}>
@@ -496,7 +496,7 @@ const UserManagement = () => {
                         )) : (
                             <tr>
                                 <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: 'var(--admin-text-muted)' }}>
-                                    Không tìm thấy người dùng nào phù hợp.
+                                    Không tìm thấy người dùng nào phù hợp…
                                 </td>
                             </tr>
                         )}

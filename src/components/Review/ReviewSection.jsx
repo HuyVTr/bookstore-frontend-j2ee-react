@@ -88,54 +88,6 @@ const ReviewSection = ({ bookId, reviews, canReview, onReviewSubmitted }) => {
                 </div>
             </div>
 
-            {canReview && (
-                <div className="add-review-card glass fade-in">
-                    <h3>✍️ Viết đánh giá của bạn</h3>
-                    <p>Chia sẻ cảm nhận của bạn để giúp những người mua khác lựa chọn tốt hơn.</p>
-                    
-                    <form onSubmit={handleSubmit} className="review-form-pro">
-                        <div className="rating-picker-wrapper">
-                            <label>Bạn đánh giá cuốn sách này mấy sao?</label>
-                            <div className="rating-stars-picker">
-                                {[1, 2, 3, 4, 5].map(s => (
-                                    <button
-                                        key={s}
-                                        type="button"
-                                        className={`star-btn ${s <= (hoverRating || newReview.rating) ? 'active' : ''}`}
-                                        onMouseEnter={() => setHoverRating(s)}
-                                        onMouseLeave={() => setHoverRating(0)}
-                                        onClick={() => setNewReview({ ...newReview, rating: s })}
-                                    >
-                                        ★
-                                    </button>
-                                ))}
-                                <span className="rating-text-feedback">
-                                    { (hoverRating || newReview.rating) === 5 && 'Tuyệt vời!' }
-                                    { (hoverRating || newReview.rating) === 4 && 'Rất tốt' }
-                                    { (hoverRating || newReview.rating) === 3 && 'Bình thường' }
-                                    { (hoverRating || newReview.rating) === 2 && 'Hơi kém' }
-                                    { (hoverRating || newReview.rating) === 1 && 'Tệ' }
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="comment-input-wrapper">
-                            <textarea
-                                placeholder="Hãy cho chúng tôi biết bạn thích (hoặc không thích) điều gì ở cuốn sách này..."
-                                value={newReview.comment}
-                                onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-                                required
-                                minLength="10"
-                            ></textarea>
-                            <small>Tối thiểu 10 ký tự</small>
-                        </div>
-
-                        <button type="submit" className="pro-submit-review-btn" disabled={submitting}>
-                            {submitting ? 'ĐANG GỬI...' : 'ĐĂNG NHẬN XÉT'}
-                        </button>
-                    </form>
-                </div>
-            )}
 
             <div className="reviews-list-premium">
                 <div className="list-header">

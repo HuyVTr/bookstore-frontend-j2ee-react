@@ -60,6 +60,14 @@
     color: #94a3b8;
     cursor: pointer;
     line-height: 1;
+    border-radius: 8px;
+    padding: 0 4px;
+    transition: color 0.2s, box-shadow 0.2s;
+}
+
+.close-btn-premium:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4);
 }
 
 .export-body {

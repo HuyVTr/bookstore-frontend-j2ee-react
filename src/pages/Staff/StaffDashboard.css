@@ -4,6 +4,11 @@
     gap: 32px;
 }
 
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+
 .welcome-banner-premium {
     background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     padding: 48px;
@@ -42,7 +47,7 @@
 /* Premium Stat Cards */
 .stat-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
     margin-bottom: 2.5rem;
 }
@@ -294,20 +299,33 @@
     gap: 16px;
     padding-bottom: 16px;
     border-bottom: 1px solid #e2e8f0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.chart-bar-container::-webkit-scrollbar {
+    display: none;
 }
 
 .chart-bar-premium {
     flex: 1;
     background: linear-gradient(to top, #93c5fd, #3b82f6);
     border-radius: 8px 8px 4px 4px;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     min-height: 4px;
+    cursor: help;
 }
 
 .chart-bar-premium:hover {
-    filter: brightness(1.1);
-    background: linear-gradient(to top, #60a5fa, #2563eb);
+    filter: brightness(1.15);
+    transform: scaleY(1.05);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.empty-state-dashboard {
+    animation: fadeIn 0.8s ease-out;
 }
 
 .chart-labels {
@@ -324,9 +342,27 @@
     letter-spacing: 1px;
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 1024px) {
     .dashboard-main-grid {
         grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .stat-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .welcome-banner-premium {
+        padding: 32px;
+    }
+
+    .card-premium {
+        padding: 24px;
+    }
+
+    .chart-bar-premium {
+        min-width: 35px;
     }
 }
 
@@ -337,7 +373,7 @@
     }
     
     .stat-cards-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 16px;
     }
 
@@ -356,16 +392,128 @@
     }
 
     .card-premium {
-        padding: 24px;
+        padding: 20px; /* Reduced from 24px */
     }
 
     .chart-bar-container {
-        gap: 8px;
+        gap: 6px; /* Reduced from 8px */
+    }
+
+    .chart-bar-premium {
+        min-width: 25px; /* Reduced from 30px */
+    }
+}
+
+@media (max-width: 480px) {
+    .card-premium {
+        padding: 16px; /* Even smaller for mobile */
+    }
+
+    .chart-bar-premium {
+        min-width: 18px; /* Fit more bars on small screens */
+    }
+    
+    .activity-message-staff {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 500px) {
+    .stat-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .stat-card-premium {
+        padding: 14px;
+        gap: 10px;
+        flex-direction: column;
+        align-items: flex-start;
+        border-radius: 16px;
+    }
+
+    .stat-icon-wrap {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+    }
+
+    .stat-icon-wrap svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
     }
 }
 
 @media (max-width: 480px) {
     .banner-visual {
         display: none;
+    }
+}
+
+/* --- MOBILE LANDSCAPE OPTIMIZATIONS --- */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .staff-overview-content {
+        gap: 16px;
+    }
+
+    .welcome-banner-premium {
+        padding: 16px 24px;
+    }
+
+    .welcome-text h2 {
+        margin-bottom: 4px;
+        font-size: 1.4rem;
+    }
+
+    .welcome-text p {
+        display: none; /* Hide text to save vertical space */
+    }
+
+    .stat-cards-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 12px;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card-premium {
+        padding: 12px;
+        gap: 8px;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .stat-icon-wrap {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+    }
+
+    .stat-icon-wrap svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .stat-value {
+        font-size: 1.1rem;
+    }
+
+    .stat-label {
+        font-size: 0.6rem;
+    }
+
+    .dashboard-main-grid {
+        gap: 16px;
+    }
+
+    .card-premium {
+        padding: 16px;
     }
 }

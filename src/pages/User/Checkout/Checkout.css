@@ -293,7 +293,7 @@
     border-radius: 20px;
     padding: 20px;
     border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
 }
 
 .total-row {
@@ -387,21 +387,6 @@
     }
 }
 
-@media (max-width: 1000px) {
-    .checkout-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .checkout-summary-section {
-        position: static;
-        order: -1;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-}
-
 /* --- PREMIUM CONFIRMATION MODAL CSS --- */
 .checkout-modal-overlay {
     position: fixed;
@@ -426,7 +411,7 @@
     padding: 40px;
     box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.3);
     position: relative;
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .modal-header {
@@ -470,7 +455,7 @@
     border-radius: 30px;
     padding: 30px;
     margin-bottom: 35px;
-    border: 1px solid rgba(0,0,0,0.03);
+    border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .info-grid {
@@ -485,7 +470,7 @@
     justify-content: space-between;
     align-items: baseline;
     padding-bottom: 12px;
-    border-bottom: 1px solid rgba(0,0,0,0.04);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .info-block.full {
@@ -545,12 +530,14 @@
 }
 
 .pay-method-pill.vnpay .vn {
-    color: #ed1c24; /* Red */
+    color: #ed1c24;
+    /* Red */
     margin-left: 4px;
 }
 
 .pay-method-pill.vnpay .pay {
-    color: #005aab; /* Blue */
+    color: #005aab;
+    /* Blue */
 }
 
 .modal-items-mini {
@@ -568,7 +555,7 @@
     position: relative;
     border-radius: 10px;
     background: white;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     flex-shrink: 0;
     opacity: 0;
 }
@@ -604,42 +591,212 @@
     gap: 20px;
 }
 
-.btn-cancel {
-    background: transparent;
-    border: none;
+.checkout-modal-container .btn-cancel {
+    flex: 1;
+    background: white;
+    border: 1.5px solid #e2e8f0;
     color: #64748b;
     font-weight: 800;
     font-size: 1rem;
     cursor: pointer;
-    padding: 10px;
-    transition: color 0.3s;
+    padding: 16px 32px;
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.btn-cancel:hover {
-    color: #0f172a;
+.checkout-modal-container .btn-cancel:hover {
+    color: #1e293b;
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
 }
 
-.btn-confirm {
+.checkout-modal-container .btn-confirm {
     flex: 1;
-    padding: 20px;
-    border-radius: 20px;
+    padding: 16px 32px;
+    border-radius: 16px;
     border: none;
-    background: var(--primary-color);
-    color: white;
+    background: #1a237e !important;
+    /* Navy */
+    color: white !important;
     font-weight: 850;
-    font-size: 1.1rem;
+    font-size: 1rem;
     cursor: pointer;
-    box-shadow: 0 12px 24px rgba(26, 35, 126, 0.3);
-    transition: all 0.3s;
+    box-shadow: 0 10px 20px rgba(26, 35, 126, 0.2);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.btn-confirm:hover {
+.checkout-modal-container .btn-confirm:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 15px 30px rgba(26, 35, 126, 0.3);
-    background: #151b60;
+    background: #151b60 !important;
 }
 
 .btn-confirm:disabled {
     opacity: 0.7;
     cursor: not-allowed;
 }
+
+@media (max-width: 1024px) {
+    .checkout-page-container {
+        padding: 40px 20px;
+    }
+
+    .checkout-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .checkout-summary-section {
+        position: static;
+        order: 2;
+        /* Move summary below form */
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .checkout-card {
+        padding: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .delivery-mode-selector {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .checkout-card h2 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .checkout-page-container {
+        padding: 20px 16px;
+    }
+
+    .checkout-card {
+        padding: 24px 16px;
+        border-radius: 20px;
+    }
+
+    .checkout-modal-container {
+        padding: 16px 14px;
+        border-radius: 20px;
+        max-width: 88%;
+    }
+
+    .success-icon-wrapper {
+        width: 44px;
+        height: 44px;
+        margin-bottom: 12px;
+        border-radius: 14px;
+    }
+
+    .success-icon-wrapper svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .modal-header {
+        margin-bottom: 15px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.15rem;
+        margin-bottom: 4px;
+    }
+
+    .modal-header p {
+        font-size: 0.75rem;
+        max-width: 220px;
+    }
+
+    .modal-body {
+        padding: 12px;
+        border-radius: 16px;
+        margin-bottom: 15px;
+    }
+
+    .info-grid {
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .info-block {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-bottom: 6px;
+        gap: 2px;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .info-block span {
+        font-size: 0.55rem;
+        letter-spacing: 0.04em;
+    }
+
+    .info-block strong {
+        font-size: 0.85rem;
+        text-align: left;
+    }
+
+    .info-block strong.text-primary {
+        font-size: 1.05rem;
+    }
+
+    .pay-method-pill {
+        padding: 4px 10px;
+        font-size: 0.75rem;
+        border-radius: 8px;
+    }
+
+    .modal-items-mini {
+        padding-top: 12px;
+        gap: 5px;
+    }
+
+    .mini-item {
+        width: 32px;
+        height: 44px;
+        border-radius: 6px;
+    }
+
+    .mini-qty {
+        width: 16px;
+        height: 16px;
+        font-size: 0.55rem;
+        bottom: -4px;
+        right: -4px;
+    }
+
+    .modal-actions {
+        flex-direction: row;
+        gap: 12px;
+    }
+
+    .checkout-modal-container .btn-cancel,
+    .checkout-modal-container .btn-confirm {
+        width: auto;
+        flex: 1;
+        padding: 14px 10px;
+        font-size: 0.85rem;
+        border-radius: 18px;
+    }
+}
+
+

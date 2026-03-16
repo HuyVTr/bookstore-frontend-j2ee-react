@@ -23,6 +23,7 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 a {
@@ -83,3 +84,15 @@ button, input, select, textarea {
 
 /* Các style source-tag đã được chuyển sang component:
    src/components/SourceTag/SourceTag.css */
+
+/* Accessibility: Support for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

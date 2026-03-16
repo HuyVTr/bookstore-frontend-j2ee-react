@@ -116,8 +116,7 @@ const AdminSettings = () => {
                             name="websiteName"
                             autoComplete="organization"
                             type="text" 
-                            className="form-input-premium" 
-                            placeholder="Ví dụ: Antigravity Bookstore…"
+                            className="form-input-premium"                             placeholder="Ví dụ: Antigravity Bookstore…"
                             value={settings.websiteName}
                             onChange={(e) => setSettings({...settings, websiteName: e.target.value})}
                         />
@@ -130,8 +129,7 @@ const AdminSettings = () => {
                             name="orderPrefix"
                             autoComplete="off"
                             type="text" 
-                            className="form-input-premium" 
-                            placeholder="Ví dụ: BK-…"
+                            className="form-input-premium"                             placeholder="Ví dụ: BK-…"
                             value={settings.orderPrefix}
                             onChange={(e) => setSettings({...settings, orderPrefix: e.target.value})}
                         />

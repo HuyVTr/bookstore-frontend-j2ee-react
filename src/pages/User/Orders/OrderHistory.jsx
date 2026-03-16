@@ -130,6 +130,30 @@ const OrderHistory = () => {
         return map[status] || { text: status, class: '', icon: '📦' };
     };
 
+    const getTimelineSteps = (status) => {
+        if (status === 'CANCELLED') {
+            return [
+                { id: 'PENDING', label: 'Xác nhận', icon: '📝', completed: true },
+                { id: 'CANCELLED', label: 'Đã hủy', icon: '❌', active: true, isError: true }
+            ];
+        }
+        
+        const steps = [
+            { id: 'PENDING', label: 'Đang xử lý', icon: '📝' },
+            { id: 'SHIPPING', label: 'Đang giao', icon: '🚚' },
+            { id: 'COMPLETED', label: 'Hoàn thành', icon: '✅' }
+        ];
+
+        let currentIdx = steps.findIndex(s => s.id === status);
+        if (currentIdx === -1) currentIdx = 0;
+
+        return steps.map((step, index) => ({
+            ...step,
+            completed: index < currentIdx,
+            active: index === currentIdx
+        }));
+    };
+
     const getBookImg = (path) => {
         if (!path) return 'https://via.placeholder.com/80x120?text=No+Cover';
         if (path.startsWith('http')) return path;
@@ -185,9 +209,19 @@ const OrderHistory = () => {
                                                 }) : 'N/A'}
                                             </span>
                                         </div>
-                                        <div className={`status-badge ${status.class}`}>
-                                            <i>{status.icon}</i> {status.text}
-                                        </div>
+                                    </div>
+
+                                    <div className="order-timeline-container">
+                                        {getTimelineSteps(order.status).map((step, index, arr) => (
+                                            <div key={step.id} className={`timeline-step ${step.completed ? 'completed' : ''} ${step.active ? 'active' : ''} ${step.isError ? 'error' : ''}`}>
+                                                <div className="step-icon-wrapper">
+                                                    <div className="step-track-left" style={{ opacity: index === 0 ? 0 : 1 }}></div>
+                                                    <div className="step-icon-inner">{step.icon}</div>
+                                                    <div className="step-track-right" style={{ opacity: index === arr.length - 1 ? 0 : 1 }}></div>
+                                                </div>
+                                                <span className="step-label-text">{step.label}</span>
+                                            </div>
+                                        ))}
                                     </div>
 
                                     <div className="order-items-list">

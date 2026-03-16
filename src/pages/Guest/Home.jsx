@@ -45,6 +45,7 @@ const Home = () => {
     const isMoodDraggedRef = useRef(false);  // True if user actually dragged (not just clicked)
 
     const handleMoodStart = (e) => {
+        if (window.innerWidth <= 768) return; // Use native scroll on mobile
         // We don't set setIsMoodDragging(true) yet to allow normal clicks
         setMoodStartX(e.touches ? e.touches[0].pageX : e.pageX);
         setIsMoodTransitioning(false);
@@ -56,7 +57,7 @@ const Home = () => {
     };
 
     const handleMoodMove = (e) => {
-        if (!moodTrackRef.current?._isMouseDown) return;
+        if (window.innerWidth <= 768 || !moodTrackRef.current?._isMouseDown) return;
 
         const currentX = e.touches ? e.touches[0].pageX : e.pageX;
         const walk = currentX - moodStartX;
@@ -96,6 +97,7 @@ const Home = () => {
     }, []);
 
     const handleMoodEnd = () => {
+        if (window.innerWidth <= 768) return; 
         if (moodTrackRef.current) {
             moodTrackRef.current._isMouseDown = false;
         }
@@ -126,7 +128,10 @@ const Home = () => {
         }
     };
 
-    const moodTrackStyle = {
+    const moodTrackStyle = (window.innerWidth <= 768) ? {
+        transform: 'none',
+        transition: 'none'
+    } : {
         transform: `translateX(calc(-${moodIndex} * (var(--mood-card-width) + var(--mood-card-gap, ${moodGap}px)) + var(--mood-drag-offset, 0px)))`,
         transition: isMoodTransitioning ? 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1)' : 'none',
     };
@@ -318,11 +323,16 @@ const Home = () => {
         const name = typeof authorData === 'string' ? authorData : authorData?.authorName;
         const img = typeof authorData === 'object' ? authorData?.authorImage : null;
 
-        if (img && img.startsWith('http')) {
-            return img;
+        if (img) {
+            if (img.startsWith('http')) return img;
+            // Build path similar to getBookImg
+            const apiBase = api.defaults.baseURL || 'http://localhost:8080/api';
+            const rootBase = apiBase.replace('/api', '');
+            const cleanPath = img.startsWith('/') ? img : `/${img}`;
+            if (cleanPath.includes('/images/')) return `${rootBase}${cleanPath}`;
+            return `${rootBase}/images${cleanPath}`;
         }
 
-        // Switch to ui-avatars as default to avoid ERR_CONNECTION_RESET from DiceBear
         return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=random&color=fff&size=128`;
     };
 
@@ -335,6 +345,9 @@ const Home = () => {
     useEffect(() => {
         const fetchHomeData = async () => {
             try {
+                const apiBase = api.defaults.baseURL || 'http://localhost:8080/api';
+                const rootBase = apiBase.replace('/api', '');
+
                 const [booksRes, bestSellerRes, categoriesRes, authorsRes] = await Promise.all([
                     api.get('public/books/newest').catch(err => ({ data: [] })),
                     api.get('public/books/best-seller').catch(err => ({ data: null })),
@@ -419,8 +432,16 @@ const Home = () => {
     const getBookImg = (path) => {
         if (!path) return 'https://via.placeholder.com/200x300?text=No+Cover';
         if (path.startsWith('http')) return path;
-        if (path.startsWith('/images/')) return `http://localhost:8080${path}`;
-        return `http://localhost:8080/images/${path.split('/').pop()}`;
+        
+        const apiBase = api.defaults.baseURL || 'http://localhost:8080/api';
+        const rootBase = apiBase.replace('/api', '');
+        
+        const cleanPath = path.startsWith('/') ? path : `/${path}`;
+        
+        if (cleanPath.includes('/images/')) {
+            return `${rootBase}${cleanPath}`;
+        }
+        return `${rootBase}/images${cleanPath}`;
     };
 
     const handleAddToCart = async (book, e) => {
@@ -559,17 +580,19 @@ const Home = () => {
                                                         </span>
                                                         {book.isOnSale && <span className="price-old-new">{book.price?.toLocaleString()} VNĐ</span>}
                                                     </div>
-                                                    <div className="stock-container-new">
-                                                        <span className="stock-text-new tabular-nums">{book.quantity || 0} Books In Stock</span>
-                                                    </div>
-                                                    <div className="book-rating-new">
-                                                        <span className="stars-new">
-                                                            {[1, 2, 3, 4, 5].map(s => (
-                                                                <span key={s} style={{ color: s <= Math.round(book.averageRating || 0) ? '#f59e0b' : '#cbd5e1' }}>★</span>
-                                                            ))}
-                                                        </span>
-                                                        <span className="rating-score-simple">{(book.averageRating || 0).toFixed(1)}</span>
-                                                        <span className="rating-count-new">({book.reviewCount || 0} đánh giá)</span>
+                                                    <div className="meta-info-row-new">
+                                                        <div className="stock-container-new">
+                                                            <span className="stock-text-new tabular-nums">{book.quantity || 0} Books In Stock</span>
+                                                        </div>
+                                                        <div className="book-rating-new">
+                                                            <span className="stars-new">
+                                                                {[1, 2, 3, 4, 5].map(s => (
+                                                                    <span key={s} style={{ color: s <= Math.round(book.averageRating || 0) ? '#f59e0b' : '#cbd5e1' }}>★</span>
+                                                                ))}
+                                                            </span>
+                                                            <span className="rating-score-simple">{(book.averageRating || 0).toFixed(1)}</span>
+                                                            <span className="rating-count-new">({book.reviewCount || 0} đánh giá)</span>
+                                                        </div>
                                                     </div>
                                                     <div className="spotlight-actions-new">
                                                         <button
@@ -792,6 +815,20 @@ const Home = () => {
                                                 Thêm vào giỏ
                                             </button>
                                             <button
+                                                className="q-view-btn-mobile"
+                                                title="Xem nhanh"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    setQuickViewBook(book);
+                                                }}
+                                            >
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                    <circle cx="12" cy="12" r="3" />
+                                                </svg>
+                                            </button>
+                                            <button
                                                 className={`m-wishlist-btn ${isInWishlist(book.id) ? 'active' : ''}`}
                                                 aria-label={isInWishlist(book.id) ? "Xóa khỏi danh sách yêu thích" : "Thêm vào danh sách yêu thích"}
                                                 onClick={(e) => {
@@ -813,12 +850,10 @@ const Home = () => {
                     {/* Mood Promo Banner - Kept separate as requested */}
                     <div className="mood-promo-banner">
                         <div className="promo-text-content">
-                            <h3>Find Your <br />Nest Books!</h3>
+                            <span className="promo-label">Limited Offer</span>
+                            <h3>Find Your <br />Next Favorite!</h3>
                             <p>Get Your 25% Discount Now!</p>
                             <button className="promo-shop-btn" onClick={() => navigate('/shop')}>Shop Now <span className="arrow">→</span></button>
-                        </div>
-                        <div className="promo-image-wrapper">
-                            <img src="/artifacts/mood_promo_girl_banner_1773223446542.png" alt="Promo" />
                         </div>
                     </div>
                 </div>
@@ -841,7 +876,7 @@ const Home = () => {
                         </button>
                         <div className="book-carousel-window">
                             <div className="book-carousel-track" style={{ transform: `translateX(-${currentPage * 100}%)` }}>
-                                {books.length > 0 ? books.map((book) => (
+                                {books.length > 0 ? books.map((book, idx) => (
                                     <div key={book.id} className="book-card-item-wrapper">
                                         <div className="book-card-alt">
                                             <Link to={`/book/${book.id}`} className="book-image-container">
@@ -862,14 +897,24 @@ const Home = () => {
                                                 </div>
                                                 <SourceTag bookSource={book.bookSource} />
                                             </Link>
-                                            <div className="book-info-centered">
+                                             <div className="book-info-centered">
+                                                <span className="m-category-name">
+                                                    {book.category?.name || 'Chưa phân loại'}
+                                                </span>
                                                 <Link to={`/book/${book.id}`} className="book-link-reset">
                                                     <h3>{book.title}</h3>
                                                 </Link>
-                                                <p className="author">
-                                                    {book.author}
+                                                <div className="author">
+                                                    <img
+                                                        src={getAuthorImg(book.author, idx)}
+                                                        alt={book.author}
+                                                        className="m-author-avatar-tiny"
+                                                        onError={(e) => handleAvatarError(e, book.author)}
+                                                        loading="lazy"
+                                                    />
+                                                    <span className="author-name">{book.author}</span>
                                                     <span className="sold-alt"> | Đã bán {book.totalSold || 0}</span>
-                                                </p>
+                                                </div>
                                                 <p className="price">{book.price?.toLocaleString()} VNĐ</p>
                                                 <div className="book-action-row">
                                                     <button
@@ -881,6 +926,20 @@ const Home = () => {
                                                         }}
                                                     >
                                                         THÊM GIỎ HÀNG
+                                                    </button>
+                                                    <button
+                                                        className="q-view-btn-mobile"
+                                                        title="Xem nhanh"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            setQuickViewBook(book);
+                                                        }}
+                                                    >
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                                            <circle cx="12" cy="12" r="3" />
+                                                        </svg>
                                                     </button>
                                                     <button
                                                         className={`wishlist-btn-simple ${isInWishlist(book.id) ? 'active' : ''}`}
@@ -951,7 +1010,7 @@ const Home = () => {
                                     <p>"{item.comment}"</p>
                                     <div className="spotlight-user">
                                         <img
-                                            src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${item.name}`}
+                                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=random&color=fff`}
                                             alt={item.name}
                                             onError={(e) => handleAvatarError(e, item.name)}
                                             loading="lazy"

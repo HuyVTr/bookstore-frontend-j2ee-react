@@ -3,11 +3,40 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../../../context/CartContext';
 import './Cart.css';
 
+const Icons = {
+    Check: () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
+    Secure: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>,
+    Return: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>,
+    Plus: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
+    Minus: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
+    Trash: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>,
+    EmptyCart: () => (
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.3 }}>
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            <path d="M17 10l2-2m0 0l2 2m-2-2v6" stroke="#ef4444"></path>
+        </svg>
+    ),
+    Warning: () => (
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+    )
+};
+
 const Cart = () => {
     const { cart, updateQuantity, removeFromCart, clearCart, loading, fetchCart } = useCart();
     const [confirmAction, setConfirmAction] = useState({ show: false, type: '', data: null });
     const [selectedIds, setSelectedIds] = useState([]);
     const navigate = useNavigate();
+
+    const cartItems = cart?.cartItems || [];
+    const selectedCartItems = cartItems.filter(item => selectedIds.includes(item.bookId || item.id));
+    const selectedTotalPrice = selectedCartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const isAllSelected = cartItems.length > 0 && selectedIds.length === cartItems.length;
 
     useEffect(() => {
         const loadCart = async () => {
@@ -16,7 +45,6 @@ const Cart = () => {
         loadCart();
     }, []);
 
-    // Effect to select all by default when cart is loaded correctly
     useEffect(() => {
         if (cart?.cartItems?.length > 0 && selectedIds.length === 0) {
             setSelectedIds(cart.cartItems.map(item => item.bookId || item.id));
@@ -97,11 +125,6 @@ const Cart = () => {
             <p>Đang tải giỏ hàng…</p>
         </div>
     );
-
-    const cartItems = cart?.cartItems || [];
-    const selectedCartItems = cartItems.filter(item => selectedIds.includes(item.bookId || item.id));
-    const selectedTotalPrice = selectedCartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const isAllSelected = cartItems.length > 0 && selectedIds.length === cartItems.length;
 
     if (cartItems.length === 0) {
         return (
@@ -247,6 +270,34 @@ const Cart = () => {
                 </div>
             </div>
 
+            {/* --- STICKY CHECKOUT BAR (Mobile/Tablet) --- */}
+            <div className="sticky-checkout-bar glass-premium fade-in">
+                <div className="sticky-bar-content">
+                    <div className="sticky-left-side">
+                        <label className="sticky-select-all" onClick={handleSelectAll}>
+                            <div className={`luxury-checkbox ${isAllSelected ? 'checked' : ''}`}>
+                                {isAllSelected && <Icons.Check />}
+                            </div>
+                            <span>Tất cả</span>
+                        </label>
+                    </div>
+                    
+                    <div className="sticky-right-side">
+                        <div className="sticky-total-info">
+                            <span className="total-label">Tổng cộng:</span>
+                            <span className="total-amount tabular-nums">{formatCurrency(selectedTotalPrice)}</span>
+                        </div>
+                        <button
+                            className="sticky-checkout-btn"
+                            onClick={() => navigate('/checkout', { state: { selectedIds } })}
+                            disabled={selectedIds.length === 0}
+                        >
+                            Thanh toán ({selectedIds.length})
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             {/* --- PREMIUM CONFIRMATION MODAL --- */}
             {confirmAction.show && (
                 <div className="cart-modal-overlay fade-in">
@@ -278,30 +329,6 @@ const Cart = () => {
             )}
         </div>
     );
-};
-
-const Icons = {
-    Check: () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
-    Secure: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>,
-    Return: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>,
-    Plus: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
-    Minus: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
-    Trash: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>,
-    EmptyCart: () => (
-        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.3 }}>
-            <circle cx="9" cy="21" r="1"></circle>
-            <circle cx="20" cy="21" r="1"></circle>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            <path d="M17 10l2-2m0 0l2 2m-2-2v6" stroke="#ef4444"></path>
-        </svg>
-    ),
-    Warning: () => (
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-            <line x1="12" y1="9" x2="12" y2="13"></line>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>
-    )
 };
 
 export default Cart;

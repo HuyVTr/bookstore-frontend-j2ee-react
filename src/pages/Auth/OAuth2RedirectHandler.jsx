@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import api from '../../services/api';
 
 const OAuth2RedirectHandler = () => {
     const navigate = useNavigate();
@@ -12,14 +13,14 @@ const OAuth2RedirectHandler = () => {
                 const res = await api.get('profile', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                
+
                 // Lưu thông tin từ profile vào localStorage
                 localStorage.setItem('username', res.data.username);
                 localStorage.setItem('roles', JSON.stringify(res.data.roles));
-                
+
                 // Sau khi lưu xong mọi thứ, mới chuyển hướng và reload
                 navigate('/', { replace: true });
-                window.location.reload(); 
+                window.location.reload();
             } catch (err) {
                 console.error("Lỗi khi tải thông tin user sau OAuth:", err);
                 navigate('/login', {

@@ -93,39 +93,42 @@ const OrderDetailModal = ({ order, onClose, onUpdateSuccess, showStatus }) => {
                         <span style={{ fontSize: '0.9rem', color: '#3b82f6', fontWeight: 800 }}>#{order.id}</span>
                     </div>
 
-                    <div className="customer-info-card">
-                        <div className="info-item">
-                            <span className="label">Người nhận</span>
-                            <span className="value">{order.receiverName}</span>
-                        </div>
-                        <div className="info-item">
-                            <span className="label">Số điện thoại</span>
-                            <span className="value">{order.phoneNumber}</span>
-                        </div>
-                        <div className="info-item">
-                            <span className="label">Địa chỉ giao hàng</span>
-                            <span className="value">{order.shippingAddress}</span>
-                        </div>
-                        <div className="info-item">
-                            <span className="label">Phương thức</span>
-                            <span className="value">{order.paymentMethod || 'Thanh toán khi nhận hàng'}</span>
-                        </div>
-                        {order.note && (
+                    <div className="order-info-mobile-wrapper">
+                        <div className="customer-info-card">
                             <div className="info-item">
-                                <span className="label">Ghi chú</span>
-                                <span className="value" style={{ fontStyle: 'italic', color: '#64748b' }}>{order.note}</span>
+                                <span className="label">Người nhận</span>
+                                <span className="value">{order.receiverName}</span>
                             </div>
-                        )}
-                    </div>
+                            <div className="info-item">
+                                <span className="label">Số điện thoại</span>
+                                <span className="value">{order.phoneNumber}</span>
+                            </div>
+                            <div className="info-item">
+                                <span className="label">Địa chỉ giao hàng</span>
+                                <span className="value">{order.shippingAddress}</span>
+                            </div>
+                            <div className="info-item">
+                                <span className="label">Phương thức</span>
+                                <span className="value">{order.paymentMethod || 'Thanh toán khi nhận hàng'}</span>
+                            </div>
+                            {order.note && (
+                                <div className="info-item">
+                                    <span className="label">Ghi chú</span>
+                                    <span className="value" style={{ fontStyle: 'italic', color: '#64748b' }}>{order.note}</span>
+                                </div>
+                            )}
+                        </div>
 
-                    <div className="info-item" style={{ marginTop: 'auto' }}>
-                        <span className="label">Thời gian đặt</span>
-                        <span className="value">{formatDate(order.orderDate)}</span>
                     </div>
                 </aside>
 
                 <main className="order-main-content">
                     <div className="order-content-scroll">
+                        <div className="info-item order-time-meta" style={{ marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid #f1f5f9' }}>
+                            <span className="label">Thời gian đặt</span>
+                            <span className="value">{formatDate(order.orderDate)}</span>
+                        </div>
+
                         <section className="status-management">
                             <h3 className="section-title">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>

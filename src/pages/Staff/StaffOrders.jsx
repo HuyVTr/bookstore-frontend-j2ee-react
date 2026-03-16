@@ -9,7 +9,7 @@ const StaffOrders = () => {
     const [loading, setLoading] = useState(true);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isDetailOpen, setIsDetailOpen] = useState(false);
-    
+
     const [statusData, setStatusData] = useState({
         isOpen: false,
         type: 'success',
@@ -29,7 +29,7 @@ const StaffOrders = () => {
             } else if (rawData && Array.isArray(rawData.content)) {
                 ordersArray = rawData.content;
             }
-            
+
             // Sắp xếp đơn hàng mới nhất lên đầu (nếu có id)
             const sortedOrders = ordersArray.sort((a, b) => (b.id || 0) - (a.id || 0));
             setOrders(sortedOrders);
@@ -104,7 +104,9 @@ const StaffOrders = () => {
         }
     };
 
+    const totalCount = orders.length;
     const pendingCount = orders.filter(o => o.status === 'PENDING').length;
+    const shippingCount = orders.filter(o => o.status === 'SHIPPING').length;
 
     return (
         <div className="staff-page-content fade-in">
@@ -114,9 +116,32 @@ const StaffOrders = () => {
                     <p>Theo dõi và cập nhật trạng thái vận chuyển cho các giao dịch mới.</p>
                 </div>
                 <div className="orders-stats-mini">
-                    <div className="mini-stat">
-                        <span className="label">Chờ duyệt</span>
-                        <span className="val" style={{color: '#f59e0b'}}>{pendingCount}</span>
+                    <div className="mini-stat-card total">
+                        <div className="stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                        </div>
+                        <div className="stat-info">
+                            <span className="val">{totalCount}</span>
+                            <span className="label">Tổng đơn</span>
+                        </div>
+                    </div>
+                    <div className="mini-stat-card pending">
+                        <div className="stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        </div>
+                        <div className="stat-info">
+                            <span className="val">{pendingCount}</span>
+                            <span className="label">Chờ duyệt</span>
+                        </div>
+                    </div>
+                    <div className="mini-stat-card shipping">
+                        <div className="stat-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                        </div>
+                        <div className="stat-info">
+                            <span className="val">{shippingCount}</span>
+                            <span className="label">Đang giao</span>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -129,8 +154,8 @@ const StaffOrders = () => {
                         <div className="shimmer-row"></div>
                     </div>
                 ) : (
-                    <div className="books-grid-premium">
-                        <div className="grid-header-premium" style={{gridTemplateColumns: '120px 1.5fr 1.2fr 1fr 1fr 1fr 100px'}}>
+                    <div className="books-grid-premium orders-grid-premium">
+                        <div className="grid-header-premium">
                             <div>Mã đơn</div>
                             <div>Khách hàng</div>
                             <div>Ngày đặt</div>
@@ -138,18 +163,18 @@ const StaffOrders = () => {
                             <div>Trạng thái</div>
                             <div>Nhân viên</div>
                             <div className="col-actions">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{marginRight: '6px', opacity: 0.8}}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                Xem Chi Tiết
+                                <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ marginRight: '6px', opacity: 0.8 }}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                <span className="actions-text">Xem Chi Tiết</span>
                             </div>
                         </div>
                         {orders.length > 0 ? orders.map((order, index) => {
                             const styles = getStatusStyles(order.status);
                             return (
-                                <div key={order.id} className={`book-row-premium stagger-${(index % 5) + 1}`} style={{gridTemplateColumns: '120px 1.5fr 1.2fr 1fr 1fr 1fr 100px'}}>
-                                    <div style={{color: '#3b82f6', fontWeight: 800}}>#{order.id}</div>
+                                <div key={order.id} className={`book-row-premium stagger-${(index % 5) + 1}`}>
+                                    <div style={{ color: '#3b82f6', fontWeight: 800 }}>#{order.id}</div>
                                     <div className="book-title">{order.receiverName || 'Khách vãng lai'}</div>
                                     <div className="book-author">{formatDate(order.orderDate)}</div>
-                                    <div className="price-text" style={{fontVariantNumeric: 'tabular-nums'}}>{formatCurrency(order.totalPrice)}</div>
+                                    <div className="price-text" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatCurrency(order.totalPrice)}</div>
                                     <div>
                                         <span className={`badge-premium`} style={{
                                             background: styles.background,
@@ -163,13 +188,13 @@ const StaffOrders = () => {
                                     </div>
                                     <div className="col-actions">
                                         <div className="actions-wrap">
-                                            <button 
-                                                className="action-btn edit" 
+                                            <button
+                                                className="action-btn edit"
                                                 title="Xem Chi Tiết & Xử Lý"
                                                 aria-label="Xem chi tiết đơn hàng"
                                                 onClick={() => handleOpenDetail(order)}
                                             >
-                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                             </button>
                                         </div>
                                     </div>
@@ -184,12 +209,12 @@ const StaffOrders = () => {
                 )}
             </div>
 
-            <div className="empty-state-premium" style={{marginTop: '40px', background: 'rgba(30, 41, 59, 0.03)', borderRadius: '24px'}}>
+            <div className="empty-state-premium" style={{ marginTop: '40px', background: 'rgba(30, 41, 59, 0.03)', borderRadius: '24px' }}>
                 <p>Mẹo: Nhấn vào biểu tượng "Con Mắt" để xem chi tiết danh sách sách khách hàng đã mua và cập nhật tiến độ giao hàng…</p>
             </div>
 
             {isDetailOpen && (
-                <OrderDetailModal 
+                <OrderDetailModal
                     order={selectedOrder}
                     onClose={handleCloseDetail}
                     onUpdateSuccess={onUpdateSuccess}
@@ -198,7 +223,7 @@ const StaffOrders = () => {
             )}
 
             {statusData.isOpen && (
-                <StatusModal 
+                <StatusModal
                     type={statusData.type}
                     title={statusData.title}
                     message={statusData.message}

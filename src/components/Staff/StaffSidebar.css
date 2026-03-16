@@ -10,7 +10,7 @@
     flex-direction: column;
     border-right: 1px solid rgba(255, 255, 255, 0.05);
     z-index: 1000;
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
 }
 
 .sidebar-header {
@@ -129,4 +129,67 @@
 
 .back-home-premium svg {
     color: #ef4444;
+}
+
+@media (max-width: 1280px) {
+    .sidebar-header {
+        padding: 24px 16px;
+    }
+    
+    .sidebar-logo {
+        font-size: 1rem;
+    }
+}
+
+/* Adaptive Lean Sidebar - Expansion on Hover for Tablet Landscape */
+@media (min-width: 992px) and (max-width: 1280px) and (orientation: landscape) {
+    .staff-sidebar {
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+    .staff-sidebar:hover {
+        width: 280px !important;
+        background: #0f172a;
+        box-shadow: 20px 0 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .staff-sidebar:hover .sidebar-logo span,
+    .staff-sidebar:hover .nav-item span,
+    .staff-sidebar:hover .nav-section {
+        display: block !important;
+        opacity: 0;
+        animation: sidebarFadeIn 0.3s forwards 0.15s;
+    }
+
+    .staff-sidebar:hover .nav-item {
+        justify-content: flex-start !important;
+        padding: 12px 16px !important;
+    }
+    
+    .staff-sidebar:hover .sidebar-header {
+        padding: 32px 24px !important;
+    }
+}
+
+@keyframes sidebarFadeIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Mobile Landscape Height Fixes */
+@media (max-height: 500px) and (orientation: landscape) {
+    .sidebar-nav {
+        overflow-y: auto;
+        max-height: calc(100vh - 120px);
+    }
+    
+    .nav-section {
+        margin: 10px 0 5px 12px;
+    }
+
+    .nav-item {
+        padding: 8px 12px;
+    }
 }

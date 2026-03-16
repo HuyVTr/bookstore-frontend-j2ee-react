@@ -158,12 +158,14 @@ const Header = () => {
     return (
         <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
             <div className="header-container">
-                <Link to="/" className="logo">
-                    <div className="logo-icon-wrapper">
-                        <img src={logo} alt="Bookstore Logo" className="header-logo-img" width="40" height="40" />
-                    </div>
-                    <span className="logo-text">BOOKSTORE</span>
-                </Link>
+                <div className="header-left">
+                    <Link to="/" className="logo">
+                        <div className="logo-icon-wrapper">
+                            <img src={logo} alt="Bookstore Logo" className="header-logo-img" width="40" height="40" />
+                        </div>
+                        <span className="logo-text">BOOKSTORE</span>
+                    </Link>
+                </div>
 
                 <nav className={`nav-menu ${isMenuOpen ? 'mobile-active' : ''}`}>
                     <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} onClick={() => setIsMenuOpen(false)}>Trang chủ</Link>
@@ -179,20 +181,19 @@ const Header = () => {
                             <Link to="/admin/reports" className="nav-link admin-link" onClick={() => setIsMenuOpen(false)}>Báo cáo</Link>
                         </>
                     )}
+
+                    {/* Show login/register in mobile menu if not logged in */}
+                    {!isLoggedIn && (
+                        <div className="mobile-auth-actions hide-desktop">
+                            <Link to="/login" className="login-link-btn" onClick={() => setIsMenuOpen(false)}>Đăng nhập</Link>
+                            <Link to="/register" className="register-link-btn-premium" onClick={() => setIsMenuOpen(false)}>Đăng ký</Link>
+                        </div>
+                    )}
                 </nav>
 
 
                 <div className="header-actions">
                     <div className="action-buttons-group">
-                        <button
-                            className={`hamburger-btn ${isMenuOpen ? 'active' : ''}`}
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            aria-label="Toggle menu"
-                        >
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </button>
 
                         {location.pathname !== '/shop' && (
                             <div className="search-wrapper-luxury hide-mobile" ref={searchRef}>
@@ -290,7 +291,7 @@ const Header = () => {
                                     <Link to="/orders" className="dropdown-link" onClick={() => setIsDropdownOpen(false)}>Lịch sử đơn hàng</Link>
                                     {Array.isArray(userRole) && (userRole.includes('AUTHOR') || userRole.includes('ROLE_AUTHOR')) && (
                                         <Link to="/author/dashboard" className="dropdown-link" style={{ color: '#f59e0b', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => setIsDropdownOpen(false)}>
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                                            <Icons.User /> {/* Placeholder icon for author dashboard */}
                                             Trung Tâm Tác Giả
                                         </Link>
                                     )}
@@ -306,6 +307,16 @@ const Header = () => {
                                 <Link to="/register" className="register-link-btn-premium hide-mobile">Đăng ký</Link>
                             </div>
                         )}
+
+                        <button
+                            className={`hamburger-btn ${isMenuOpen ? 'active' : ''}`}
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            aria-label="Toggle menu"
+                        >
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
                     </div>
                 </div>
 

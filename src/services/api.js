@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// Tự động nhận diện hostname để hỗ trợ test trên mobile/PC cùng mạng
+const API_BASE_URL = `http://${window.location.hostname}:8080/api`;
+
 const api = axios.create({
-    baseURL: 'http://localhost:8080/api',
+    baseURL: API_BASE_URL,
 });
 
 // Interceptor để tự động gắn Token vào Header nếu có

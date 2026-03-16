@@ -49,14 +49,19 @@ const AuthorDashboard = () => {
         },
         { 
             label: 'Đánh giá trung bình', 
-            value: stats.averageRating + ' / 5.0', 
+            value: (Number(stats.averageRating) || 0).toFixed(1) + ' / 5.0', 
             icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>, 
             color: 'purple' 
         }
     ];
 
     if (loading) {
-        return <div className="staff-overview-content fade-in">Đang tải trung tâm điều hành...</div>;
+        return (
+            <div className="suggestion-loading fade-in" style={{ height: '60vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <div className="spinner-tiny"></div>
+                <span>Đang tải trung tâm điều hành…</span>
+            </div>
+        );
     }
 
     return (
@@ -73,13 +78,13 @@ const AuthorDashboard = () => {
 
             <div className="stat-cards-grid">
                 {statCards.map((card, i) => (
-                    <div key={i} className={`stat-card-premium stagger-${i+1}`}>
+                    <div key={i} className={`stat-card-premium stagger-${i+1}`} role="status" aria-label={card.label}>
                         <div className={`stat-icon-wrap ${card.color}`}>
                             {card.icon}
                         </div>
                         <div className="stat-info">
                             <span className="stat-label">{card.label}</span>
-                            <span className="stat-value">{card.value}</span>
+                            <span className="stat-value tabular-nums">{card.value}</span>
                         </div>
                     </div>
                 ))}
@@ -100,12 +105,16 @@ const AuthorDashboard = () => {
                                         {act[2] === 'COMPLETED' ? ' (Giao thành công)' : ` (Trạng thái: ${act[2]})`}
                                     </p>
                                     <div className="activity-meta-staff">
-                                        <span className="time-staff">{new Date(act[3]).toLocaleString('vi-VN')}</span>
+                                        <span className="time-staff tabular-nums">{new Date(act[3]).toLocaleString('vi-VN')}</span>
                                     </div>
                                 </div>
                             </div>
                         )) : (
-                            <div className="empty-state-dashboard">Chưa có hoạt động mua hàng nào.</div>
+                            <div className="empty-state-dashboard" style={{ textAlign: 'center', padding: '40px 20px', color: '#64748b' }}>
+                                <div style={{ fontSize: '2rem', marginBottom: '16px' }}>📭</div>
+                                <p style={{ fontWeight: 600 }}>Chưa có hoạt động mua hàng nào.</p>
+                                <span style={{ fontSize: '0.85rem' }}>Các thông báo mới sẽ xuất hiện tại đây khi độc giả mua tác phẩm của bạn.</span>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -114,12 +123,11 @@ const AuthorDashboard = () => {
                     <div className="card-header-premium">
                         <h3>Lượt tiếp cận độc giả</h3>
                     </div>
-                    <div className="dummy-chart-premium">
+                    <div className="dummy-chart-premium" role="img" aria-label="Biểu đồ lượt tiếp cận độc giả theo tháng">
                         <div className="chart-bar-container">
                             {Array.from({ length: 12 }, (_, i) => {
                                 const monthData = stats.chartData.find(d => d[0] === i + 1);
                                 const count = monthData ? monthData[1] : 0;
-                                // Calculate height relative to max in year
                                 const maxSales = Math.max(...stats.chartData.map(d => d[1]), 10);
                                 const h = (count / maxSales) * 100;
                                 return (
@@ -127,6 +135,7 @@ const AuthorDashboard = () => {
                                         key={i} 
                                         className="chart-bar-premium" 
                                         title={`Tháng ${i+1}: ${count} bản`}
+                                        aria-label={`Tháng ${i+1}: ${count} bản`}
                                         style={{ height: `${Math.max(h, 5)}%`, background: count > 0 ? 'linear-gradient(to top, #f59e0b, #fbbf24)' : '#e2e8f0' }}
                                     ></div>
                                 );

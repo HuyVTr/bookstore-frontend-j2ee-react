@@ -28,9 +28,11 @@ const Login = () => {
         fetchSystemConfig();
     }, []);
 
-    const GOOGLE_AUTH_URL = "http://localhost:8080/oauth2/authorization/google";
-    const GITHUB_AUTH_URL = "http://localhost:8080/oauth2/authorization/github";
-    const FACEBOOK_AUTH_URL = "http://localhost:8080/oauth2/authorization/facebook";
+    // Sử dụng hostname động để tránh lỗi Localhost khi test trên Mobile thật
+    const BACKEND_BASE_URL = `http://${window.location.hostname}:8080`;
+    const GOOGLE_AUTH_URL = `${BACKEND_BASE_URL}/oauth2/authorization/google`;
+    const GITHUB_AUTH_URL = `${BACKEND_BASE_URL}/oauth2/authorization/github`;
+    const FACEBOOK_AUTH_URL = `${BACKEND_BASE_URL}/oauth2/authorization/facebook`;
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -78,13 +80,13 @@ const Login = () => {
 
                         <div className="social-grid">
                             <a href={GOOGLE_AUTH_URL} className="social-stitch-btn" title="Tiếp tục với Google" aria-label="Tiếp tục với Google">
-                                <img src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png" alt="Google" />
+                                <img src="https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png" alt="Google" width="20" height="20" />
                             </a>
                             <a href={GITHUB_AUTH_URL} className="social-stitch-btn" title="Tiếp tục với GitHub" aria-label="Tiếp tục với GitHub">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" />
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub" width="20" height="20" />
                             </a>
                             <a href={FACEBOOK_AUTH_URL} className="social-stitch-btn" title="Tiếp tục với Facebook" aria-label="Tiếp tục với Facebook">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="Facebook" />
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="Facebook" width="20" height="20" />
                             </a>
                         </div>
 
@@ -102,7 +104,7 @@ const Login = () => {
                                     name="username"
                                     type="text"
                                     className="stitch-input"
-                                    placeholder="Nhập email hoặc username"
+                                    placeholder="Nhập email hoặc username…"
                                     value={loginId}
                                     onChange={(e) => setLoginId(e.target.value)}
                                     required
@@ -116,7 +118,7 @@ const Login = () => {
                                     name="password"
                                     type="password"
                                     className="stitch-input"
-                                    placeholder="Nhập mật khẩu"
+                                    placeholder="Nhập mật khẩu…"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
@@ -148,7 +150,7 @@ const Login = () => {
                     <div className="floating-shape shape-3" aria-hidden="true"></div>
 
                     <div className="stitch-logo-indicator">
-                        <img src={logo} alt="Bookstore Logo" className="auth-brand-logo" />
+                        <img src={logo} alt="Bookstore Logo" className="auth-brand-logo" width="60" height="60" />
                         <span>BOOKSTORE</span>
                     </div>
                     <div className="branding-content">

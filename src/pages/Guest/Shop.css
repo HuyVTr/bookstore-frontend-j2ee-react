@@ -113,7 +113,20 @@
     border-radius: 40px;
     font-weight: 700;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s, box-shadow 0.3s;
+}
+
+.search-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: static !important;
+    margin: 0 !important;
+    transform: none !important;
 }
 
 .search-trigger-btn:focus-visible {
@@ -788,8 +801,75 @@
     .shop-search-standalone { flex-direction: column; border-radius: 20px; padding: 12px; }
     .shop-search-standalone input { padding: 12px; margin-bottom: 8px; }
     .search-trigger-btn { width: 100%; }
-    .shop-top-bar { flex-direction: column; gap: 16px; align-items: flex-start; }
-    .shop-books-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+
+    /* Top Bar Mobile Format */
+    .shop-top-bar { 
+        flex-direction: column; 
+        gap: 16px; 
+        align-items: stretch; /* Stretch to fill width */
+    }
+    
+    .results-info {
+        text-align: left;
+        padding-bottom: 8px;
+        border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+    }
+
+    .top-bar-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .filter-dropdown-wrapper,
+    .sorting-control {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    /* 2 Cards Per Row on Mobile */
+    .shop-books-grid { 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 12px; /* Smaller gap for mobile */
+    }
+
+    /* Adjust card padding for mobile */
+    .premium-book-card {
+        padding: 10px;
+        border-radius: 16px;
+    }
+    
+    .overlay-btn.main {
+        padding: 8px;
+        font-size: 0.75rem;
+    }
+
+    /* Fix Sold Count format on small screens */
+    .book-author-row {
+        flex-wrap: nowrap !important;
+        gap: 4px !important;
+        align-items: center !important;
+    }
+
+    .book-author-name {
+        font-size: 0.75rem !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    .sold-count {
+        font-size: 0.65rem !important;
+        padding: 2px 6px !important;
+        white-space: nowrap !important;
+        border-radius: 4px !important;
+        flex-shrink: 0 !important;
+        display: inline-block !important;
+    }
 }
 
 /* Quick View Modal Styles (Synchronized via Shared Component) */

@@ -53,7 +53,7 @@
     padding: 30px 0;
     border-bottom: 1px solid rgba(226, 232, 240, 0.6);
     gap: 24px;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease, margin 0.3s ease, padding 0.3s ease, border-radius 0.3s ease;
 }
 
 .cart-item.selected {
@@ -538,10 +538,233 @@
     box-shadow: 0 12px 25px rgba(239, 68, 68, 0.3);
 }
 
+@media (max-width: 1200px) {
+    .cart-content-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+    .summary-card {
+        position: static;
+    }
+}
+
 @media (max-width: 768px) {
-    .cart-page-container { padding: 40px 20px; }
-    .cart-item { flex-direction: column; text-align: center; gap: 20px; padding: 40px 0; }
-    .item-total-col { width: 100%; text-align: center; font-size: 1.6rem; }
-    .item-image-premium { width: 140px; height: 200px; }
-    .cart-header h1 { font-size: 2.6rem; }
+    .cart-page-container {
+        padding: 40px 20px;
+    }
+
+    .cart-header h1 {
+        font-size: 2.4rem;
+    }
+
+    .items-list {
+        padding: 20px;
+        border-radius: 20px;
+    }
+
+    .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        padding: 30px 0;
+        gap: 20px;
+        position: relative;
+    }
+
+    .item-image-premium {
+        width: 120px;
+        height: 170px;
+        margin: 0 auto;
+    }
+
+    .item-info {
+        width: 100%;
+        text-align: center;
+    }
+
+    .item-info h3 {
+        font-size: 1.2rem;
+    }
+
+    .cart-item-actions {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .qty-controls-luxury {
+        width: fit-content;
+    }
+
+    .item-total-col {
+        width: 100%;
+        text-align: center;
+        border-top: 1px solid #f1f5f9;
+        padding-top: 20px;
+    }
+
+    .item-total-val {
+        font-size: 1.6rem;
+    }
+
+    .remove-item-btn-premium {
+        position: absolute;
+        top: 20px;
+        right: 0;
+    }
+    
+    .select-item-container {
+        position: absolute;
+        top: 20px;
+        left: 0;
+    }
+
+    .cart-footer-actions {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+
+    .clear-cart-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .cart-page-container {
+        padding: 30px 16px;
+    }
+
+    .cart-header h1 {
+        font-size: 2rem;
+    }
+
+    .empty-cart-card h2 {
+        font-size: 1.8rem;
+    }
+
+    .summary-card {
+        padding: 24px 20px;
+        border-radius: 24px;
+    }
+}
+
+/* --- STICKY CHECKOUT BAR (Mobile/Tablet) --- */
+.sticky-checkout-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
+    z-index: 1000;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 1200px) {
+    .cart-page-container {
+        padding-bottom: 120px; /* Space for sticky bar */
+    }
+    
+    .cart-summary-section {
+        display: none; /* Hide original summary on smaller screens as it's now sticky */
+    }
+
+    .sticky-checkout-bar {
+        display: block;
+    }
+
+    .sticky-bar-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .sticky-left-side {
+        display: flex;
+        align-items: center;
+    }
+
+    .sticky-select-all {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        color: #475569;
+        cursor: pointer;
+    }
+
+    .sticky-right-side {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .sticky-total-info {
+        text-align: right;
+    }
+
+    .total-label {
+        display: block;
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .total-amount {
+        display: block;
+        font-size: 1.25rem;
+        font-weight: 900;
+        color: #1a237e;
+    }
+
+    .sticky-checkout-btn {
+        background: #1a237e;
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 14px;
+        font-weight: 850;
+        font-size: 0.95rem;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(26, 35, 126, 0.2);
+        white-space: nowrap;
+    }
+
+    .sticky-checkout-btn:disabled {
+        background: #cbd5e1;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .sticky-checkout-bar {
+        padding: 14px 16px;
+    }
+
+    .sticky-right-side {
+        gap: 12px;
+    }
+
+    .total-amount {
+        font-size: 1.1rem;
+    }
+
+    .sticky-checkout-btn {
+        padding: 12px 20px;
+        font-size: 0.85rem;
+    }
+    
+    .sticky-select-all span {
+        display: none; /* Icon only on very small screens if necessary, though "Tất cả" is short */
+    }
 }

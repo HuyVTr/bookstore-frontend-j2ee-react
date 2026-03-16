@@ -14,12 +14,13 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
+    background:
         radial-gradient(circle at 0% 0%, rgba(26, 35, 126, 0.06), transparent 60%),
         radial-gradient(circle at 100% 0%, rgba(245, 124, 0, 0.05), transparent 60%),
         radial-gradient(circle at 100% 100%, rgba(26, 35, 126, 0.04), transparent 60%),
         radial-gradient(circle at 0% 100%, rgba(245, 124, 0, 0.03), transparent 60%);
-    z-index: -10; /* Đảm bảo nằm dưới tất cả, kể cả Footer */
+    z-index: -10;
+    /* Đảm bảo nằm dưới tất cả, kể cả Footer */
     pointer-events: none;
     background-attachment: fixed;
 }
@@ -168,13 +169,12 @@
     margin-bottom: 10px;
 }
 
-.book-title {
+.book-info .book-title {
     font-size: 3.2rem;
     font-weight: 800;
     line-height: 1.1;
     margin-bottom: 24px;
     color: #0f172a;
-    /* Slate 900 */
     letter-spacing: -0.02em;
 }
 
@@ -441,7 +441,7 @@
     font-weight: 600;
     cursor: pointer;
     position: relative;
-    transition: all 0.3s;
+    transition: color 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
 }
 
 .tab-headers button.active {
@@ -516,7 +516,7 @@
     padding: 20px;
     background: #f8fafc;
     border-radius: 16px;
-    transition: all 0.3s;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     border: 1px solid #f1f5f9;
 }
 
@@ -696,7 +696,7 @@
     font-weight: 700;
     border: none;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .submit-review-btn:hover:not(:disabled) {
@@ -786,7 +786,7 @@
     background: white;
     border-radius: 24px;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
     color: #1e293b;
     border: 1px solid #f1f5f9;
@@ -869,9 +869,17 @@
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+    .book-detail-container {
+        padding: 20px 30px 40px;
+    }
+}
+
 @media (max-width: 1024px) {
     .book-main-content {
         grid-template-columns: 1fr;
+        gap: 40px;
+        padding: 40px;
     }
 
     .book-media {
@@ -879,15 +887,34 @@
         max-width: 500px;
         margin: 0 auto;
     }
+
+    .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
-    .related-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .book-detail-container {
+        padding: 15px 20px 30px;
+    }
+
+    .breadcrumb {
+        margin-bottom: 20px;
     }
 
     .book-title {
-        font-size: 2rem;
+        font-size: 2.2rem;
+        margin-bottom: 15px;
+    }
+
+    .author-row {
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .book-main-content {
+        padding: 30px 20px;
+        border-radius: 20px;
     }
 
     .purchase-controls {
@@ -895,7 +922,126 @@
         gap: 15px;
     }
 
+    .quantity-selector {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .add-to-cart-btn,
+    .buy-now-btn {
+        width: 100%;
+        padding: 18px;
+    }
+
     .guarantees {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+    }
+
+    .g-item {
+        font-size: 0.65rem;
+        gap: 6px;
+        text-align: center;
+        word-break: break-word;
+        /* Prevents long words from breaking the grid columns */
+    }
+
+    .tab-headers {
+        gap: 20px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        scrollbar-width: none;
+    }
+
+    .tab-headers::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tab-headers button {
+        white-space: nowrap;
+        font-size: 1rem;
+    }
+
+    .tab-content {
+        padding: 25px 20px;
+    }
+
+    .info-grid {
         grid-template-columns: 1fr;
+    }
+
+    .related-grid {
+        display: flex;
+        overflow-x: auto;
+        gap: 20px;
+        padding: 10px 0 30px;
+        scrollbar-width: none;
+        scroll-snap-type: x mandatory;
+    }
+
+    .related-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .related-card-alt {
+        flex: 0 0 240px;
+        scroll-snap-align: center;
+    }
+
+    .reviews-summary {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .rating-avg {
+        border-right: none;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .book-detail-container {
+        padding: 10px 16px 30px;
+    }
+
+    .book-info .book-title {
+        font-size: 1.8rem;
+    }
+
+    .book-main-content {
+        padding: 24px 16px;
+    }
+
+    .short-description {
+        font-size: 1rem;
+        padding-left: 15px;
+    }
+
+    .book-extras {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .extra-item {
+        font-size: 0.8rem;
+        flex: 1;
+        justify-content: center;
+        white-space: nowrap;
+    }
+
+    .review-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .review-stars {
+        padding-left: 60px;
+    }
+
+    .review-comment {
+        padding-left: 0;
+        margin-top: 10px;
     }
 }

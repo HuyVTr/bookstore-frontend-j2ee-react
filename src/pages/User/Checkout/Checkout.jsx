@@ -407,7 +407,7 @@ const Checkout = () => {
                                 Quay lại sửa
                             </button>
                             <button type="button" className="btn-confirm" onClick={finalSubmitOrder} disabled={submitting}>
-                                {submitting ? "Đang xử lý…" : "Xác nhận & Thanh toán"}
+                                {submitting ? "Đang xử lý…" : "Xác nhận"}
                             </button>
                         </div>
                     </div>

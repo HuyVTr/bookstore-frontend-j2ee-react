@@ -173,11 +173,11 @@ const AdminAnalytics = () => {
             <style>{`
                 .analytics-main-layout { margin-top: 2rem; display: flex; flex-direction: column; gap: 2rem; }
                 .analytics-dual-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; }
-                .premium-shadow { box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; }
+                .premium-shadow { box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; }
                 .analytics-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.1); }
                 
                 .header-with-icon { display: flex; align-items: center; gap: 12px; }
-                .icon-box { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+                .icon-box { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
                 .blue-soft { background: #eff6ff; color: #3b82f6; }
                 .orange-soft { background: #fff7ed; color: #f59e0b; }
                 .green-soft { background: #f0fdf4; color: #10b981; }
@@ -186,8 +186,8 @@ const AdminAnalytics = () => {
 
                 /* Premium Chart */
                 .premium-chart-container { display: flex; height: 320px; gap: 20px; margin-top: 1rem; position: relative; }
-                .chart-y-axis { display: flex; flex-direction: column; justify-content: space-between; height: 250px; padding-bottom: 30px; font-size: 0.75rem; color: #94a3b8; text-align: right; width: 90px; }
-                .chart-main-area { flex: 1; height: 250px; position: relative; border-left: 1px dashed #e2e8f0; border-bottom: 2px solid #e2e8f0; }
+                .chart-y-axis { display: flex; flex-direction: column; justify-content: space-between; height: 250px; padding-bottom: 30px; font-size: 0.75rem; color: #94a3b8; text-align: right; width: 90px; flex-shrink: 0; }
+                .chart-main-area { flex: 1; height: 250px; position: relative; border-left: 1px dashed #e2e8f0; border-bottom: 2px solid #e2e8f0; min-width: 0; }
                 .chart-grid-lines { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; z-index: 0; }
                 .grid-line { height: 1px; width: 100%; border-top: 1px dashed #f1f5f9; }
                 
@@ -197,7 +197,7 @@ const AdminAnalytics = () => {
                 .bar-glow { position: absolute; inset: 0; background: linear-gradient(to top, rgba(255,255,255,0.2), transparent); opacity: 0; transition: 0.3s; }
                 .bar-interactive:hover { filter: brightness(1.1); width: 40%; }
                 .bar-interactive:hover .bar-glow { opacity: 1; }
-                .col-label { font-size: 0.75rem; font-weight: 600; color: #64748b; margin-bottom: -30px; }
+                .col-label { font-size: 0.7rem; font-weight: 600; color: #64748b; margin-bottom: -30px; }
 
                 /* Tooltip */
                 .premium-tooltip { 
@@ -218,11 +218,11 @@ const AdminAnalytics = () => {
                 .rank-1 { background: #fef3c7; color: #d97706; }
                 .rank-2 { background: #f1f5f9; color: #475569; }
                 .rank-3 { background: #ffedd5; color: #c2410c; }
-                .rank-content { flex: 1; display: flex; justify-content: space-between; align-items: center; }
-                .rank-main-info { display: flex; flex-direction: column; gap: 2px; }
-                .book-name-rank { font-weight: 600; color: #1e293b; font-size: 0.95rem; }
+                .rank-content { flex: 1; display: flex; justify-content: space-between; align-items: center; min-width: 0; }
+                .rank-main-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+                .book-name-rank { font-weight: 600; color: #1e293b; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
                 .book-cat-rank { font-size: 0.75rem; color: #94a3b8; font-weight: 500; }
-                .rank-stat-info { text-align: right; display: flex; flex-direction: column; }
+                .rank-stat-info { text-align: right; display: flex; flex-direction: column; flex-shrink: 0; }
                 .sold-count-rank { color: #10b981; font-weight: 700; font-size: 0.85rem; }
                 .rev-count-rank { color: #64748b; font-size: 0.75rem; font-weight: 500; }
 
@@ -233,6 +233,24 @@ const AdminAnalytics = () => {
                 .mini-bar-fill { width: 100%; background: #10b981; border-radius: 4px; transition: 1s cubic-bezier(0.16, 1, 0.3, 1); cursor: crosshair; }
                 .mini-bar-fill:hover { background: #059669; }
                 .mini-chart-labels { display: flex; justify-content: space-between; margin-top: 15px; font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
+
+                @media (max-width: 900px) {
+                    .analytics-dual-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+                    .premium-chart-container { height: 280px; gap: 10px; }
+                    .chart-y-axis { width: 70px; font-size: 0.65rem; }
+                }
+
+                @media (max-width: 480px) {
+                    .analytics-main-layout { margin-top: 1.25rem; gap: 1.5rem; }
+                    .premium-chart-container { height: 240px; }
+                    .chart-y-axis { display: none; } /* Hide Y axis on very small screens for more space */
+                    .chart-main-area { border-left: none; }
+                    .col-label { font-size: 0.6rem; }
+                    .analytics-card { padding: 1.25rem; }
+                    .rank-stat-info { display: none; } /* Hide secondary stats in ranking on mobile portrait */
+                    .mini-chart-area { gap: 6px; height: 150px; }
+                    .badge-premium-pill { display: none; }
+                }
             `}</style>
         </div>
     );

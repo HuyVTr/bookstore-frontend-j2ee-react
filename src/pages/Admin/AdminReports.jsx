@@ -275,7 +275,7 @@ const AdminReports = () => {
                 .analytics-dual-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; margin-top: 2rem; }
                 .premium-shadow { box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; }
                 .header-with-icon { display: flex; align-items: center; gap: 12px; }
-                .icon-box { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+                .icon-box { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
                 .blue-soft { background: #eff6ff; color: #3b82f6; }
                 .green-soft { background: #f0fdf4; color: #10b981; }
                 .orange-soft { background: #fff7ed; color: #f59e0b; }
@@ -300,11 +300,11 @@ const AdminReports = () => {
 
                 .top-spenders-list { display: flex; flex-direction: column; gap: 1rem; }
                 .spender-row { display: flex; align-items: center; gap: 1rem; padding: 12px; border-radius: 12px; background: #f8fafc; border: 1px solid #f1f5f9; }
-                .spender-avatar { width: 40px; height: 40px; border-radius: 50%; background: #6366f1; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; }
-                .spender-info { flex: 1; display: flex; flex-direction: column; }
-                .spender-name { font-weight: 600; color: #1e293b; font-size: 0.9rem; }
-                .spender-email { font-size: 0.75rem; color: #64748b; }
-                .spender-total { font-weight: 700; color: #10b981; font-size: 0.95rem; }
+                .spender-avatar { width: 40px; height: 40px; border-radius: 50%; background: #6366f1; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+                .spender-info { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+                .spender-name { font-weight: 600; color: #1e293b; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                .spender-email { font-size: 0.75rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                .spender-total { font-weight: 700; color: #10b981; font-size: 0.95rem; flex-shrink: 0; }
 
                 .platform-stats-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
                 .platform-stat-card { padding: 15px; background: white; border: 1px solid #f1f5f9; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
@@ -312,6 +312,23 @@ const AdminReports = () => {
                 .platform-count { font-weight: 800; color: #1e293b; font-size: 1.2rem; }
                 .platform-count small { font-size: 0.7rem; color: #94a3b8; font-weight: 500; }
                 .empty-msg { color: #94a3b8; font-style: italic; }
+
+                @media (max-width: 900px) {
+                    .analytics-dual-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+                }
+
+                @media (max-width: 480px) {
+                    .manage-header { text-align: center; align-items: center; }
+                    .header-actions { width: 100%; display: flex; justify-content: center; }
+                    .btn-export-premium { width: 100%; justify-content: center; }
+                    .analytics-card { padding: 1.25rem; }
+                    .spender-row { padding: 10px; gap: 0.75rem; }
+                    .spender-total { font-size: 0.85rem; }
+                    .cat-name { font-size: 0.85rem; }
+                    .cat-val { font-size: 0.8rem; }
+                    .pm-name { font-size: 0.85rem; }
+                    .pm-percent { font-size: 1rem; }
+                }
             `}</style>
 
             <ExportReportModal 

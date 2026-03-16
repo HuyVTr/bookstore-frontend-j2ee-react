@@ -120,7 +120,7 @@ const AuthorProfile = () => {
     const username = user?.username || localStorage.getItem('username') || 'Author';
 
     if (loading && !user) {
-        return <div className="staff-page-content fade-in"><p>Đang tải thông tin hồ sơ...</p></div>;
+        return <div className="staff-page-content fade-in"><p>Đang tải thông tin hồ sơ…</p></div>;
     }
 
     return (
@@ -187,12 +187,14 @@ const AuthorProfile = () => {
                                                 value={formData.fullName} 
                                                 onChange={handleInputChange}
                                                 className="s-input" 
+                                                autoComplete="name"
+                                                spellCheck={false}
                                                 required
                                             />
                                         </div>
                                         <div className="s-form-group">
                                             <label>Email liên hệ</label>
-                                            <input type="text" value={user?.email} className="s-input" disabled style={{opacity: 0.6}} />
+                                            <input type="text" value={user?.email} className="s-input" disabled style={{opacity: 0.6}} spellCheck={false} />
                                         </div>
                                         <div className="s-form-group full-width">
                                             <label>Tiểu sử tác giả (Bio)</label>
@@ -228,6 +230,7 @@ const AuthorProfile = () => {
                                             onChange={handlePasswordChange}
                                             placeholder="Nhập mật khẩu hiện tại" 
                                             className="s-input" 
+                                            autoComplete="current-password"
                                             required
                                         />
                                     </div>
@@ -240,6 +243,7 @@ const AuthorProfile = () => {
                                             onChange={handlePasswordChange}
                                             placeholder="Nhập mật khẩu mới" 
                                             className="s-input" 
+                                            autoComplete="new-password"
                                             required
                                         />
                                         <span className="s-hint">Gợi ý: Mật khẩu nên có ít nhất 6 ký tự.</span>
@@ -253,6 +257,7 @@ const AuthorProfile = () => {
                                             onChange={handlePasswordChange}
                                             placeholder="Nhập lại mật khẩu mới" 
                                             className="s-input" 
+                                            autoComplete="new-password"
                                             required
                                         />
                                     </div>

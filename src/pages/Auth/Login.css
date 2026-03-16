@@ -156,10 +156,10 @@
     background: #ffffff;
     border: 2px solid #b8c5d6;
     border-radius: 12px;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-                border-color 0.3s ease, 
-                background-color 0.3s ease, 
-                box-shadow 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        border-color 0.3s ease,
+        background-color 0.3s ease,
+        box-shadow 0.3s ease;
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
@@ -237,7 +237,8 @@
     border-color: var(--auth-primary);
     background: #ffffff;
     box-shadow: 0 0 0 4px rgba(26, 35, 126, 0.08);
-    outline: none; /* replacement focus visible is handled by border and box-shadow */
+    outline: none;
+    /* replacement focus visible is handled by border and box-shadow */
 }
 
 .stitch-input::placeholder {
@@ -473,8 +474,20 @@
     font-size: 1.5rem;
 }
 
-/* Hiệu ứng Responsive */
+/* Responsive Refinements - Premium & Robust */
+
+/* 1. TABLET & IPAD (Horizontal but refined) */
 @media (max-width: 1024px) {
+    .login-auth-wrapper {
+        padding: 30px;
+    }
+
+    .form-container-all,
+    .login-page-specific .form-container-all {
+        max-width: 900px;
+        min-height: 520px;
+    }
+
     .auth-side-form {
         padding: 40px;
     }
@@ -482,38 +495,135 @@
     .login-form-side {
         padding: 40px 50px;
     }
+
+    .login-form-side .form-header h2 {
+        font-size: 2.2rem;
+    }
+
+    .login-page-specific .branding-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .stitch-logo-indicator {
+        top: 30px;
+        left: 30px;
+    }
 }
 
+/* 2. LARGE MOBILE & SMALL TABLET (Switch to vertical) */
 @media (max-width: 900px) {
-    .form-container-all {
+
+    .form-container-all,
+    .login-page-specific .form-container-all {
         flex-direction: column;
-        max-width: 550px;
+        max-width: 500px;
         min-height: auto;
+        border-radius: 20px;
+        margin: 20px auto;
     }
 
     .auth-side-branding {
-        padding: 60px 40px;
+        padding: 50px 30px; /* Balanced padding */
         flex: none;
         width: 100%;
+        min-height: auto; /* Let content dictate height or use a stable min */
     }
 
-    .auth-side-form {
-        padding: 50px 40px;
+    .login-page-specific .auth-side-branding {
+        min-height: 280px;
+    }
+
+    .auth-side-form,
+    .login-form-side {
+        padding: 40px 30px;
         width: 100%;
     }
 
-    .login-form-side {
-        padding: 50px 40px;
+    .stitch-logo-indicator,
+    .login-page-specific .stitch-logo-indicator {
+        position: relative !important;
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 25px; /* Clear space before heading */
+        display: flex;
+        align-items: center;
+    }
+
+    .auth-brand-logo {
+        width: 50px;
+        height: 50px;
+    }
+
+    .branding-content h1,
+    .login-page-specific .branding-content h1 {
+        font-size: 1.85rem !important; /* Force smaller size for mobile */
+        margin-bottom: 12px !important;
+        line-height: 1.25;
+    }
+
+    .branding-content p,
+    .login-page-specific .branding-content p {
+        font-size: 0.95rem;
+        max-width: 90%;
+        margin: 0 auto;
+    }
+
+    .social-stitch-btn {
+        height: 50px;
     }
 }
 
-@media (max-width: 600px) {
+/* 3. SMALL MOBILE (Max native feel) */
+@media (max-width: 480px) {
     .login-auth-wrapper {
-        padding: 0;
+        padding: 10px;
+        background: #ffffff;
+        /* Use white background on mobile to blend card */
     }
 
-    .form-container-all {
+    .form-container-all,
+    .login-page-specific .form-container-all {
+        max-width: 100%;
+        margin: 0;
         border-radius: 0;
         box-shadow: none;
+        border: none;
+    }
+
+    .auth-side-branding {
+        padding: 40px 20px;
+        border-radius: 0; /* Align with bottom of card */
+    }
+
+    .auth-side-form,
+    .login-form-side {
+        padding: 30px 20px;
+    }
+
+    .form-header h2,
+    .login-form-side .form-header h2 {
+        font-size: 1.8rem;
+        text-align: center;
+    }
+
+    .form-header p {
+        text-align: center;
+    }
+
+    .stitch-submit-btn {
+        padding: 16px;
+        font-size: 1rem;
+    }
+
+    .social-grid {
+        justify-content: center;
+    }
+
+    .login-auth-wrapper {
+        background-image: none;
+        /* Simplify on mobile */
     }
 }

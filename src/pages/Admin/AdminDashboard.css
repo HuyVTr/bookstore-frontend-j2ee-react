@@ -1,10 +1,25 @@
 /* AdminDashboard.css - High-end Analytics Dashboard */
 
-.admin-dashboard {
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+.admin-dashboard,
+.admin-page-content {
     padding: 2rem;
     background: #f8fafc;
     min-height: 100vh;
     touch-action: manipulation;
+}
+
+/* Ensure fade-in works with our layout */
+.fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .admin-banner-premium {
@@ -43,7 +58,7 @@
 /* Luxury Stat Cards */
 .admin-stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
     margin-bottom: 2.5rem;
 }
@@ -136,6 +151,60 @@
     color: #ef4444;
 }
 
+/* Revenue Report Glass Cards */
+.stat-card-glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 120px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-glass::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.1), transparent 70%);
+}
+
+.stat-card-glass:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: var(--admin-primary);
+}
+
+.stat-card-glass h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+}
+
+.stat-card-glass .value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -0.02em;
+}
+
 .stat-card-icon-wrap {
     width: 56px;
     height: 56px;
@@ -161,6 +230,7 @@
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 1.5rem;
+    align-items: start; /* Prevents cards from stretching vertically to match each other */
 }
 
 .analytics-card {
@@ -234,6 +304,14 @@
     align-items: flex-end;
     gap: 12px;
     padding-bottom: 20px;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE/Edge */
+    padding-top: 10px;
+}
+
+.chart-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
 }
 
 .chart-bar-group {
@@ -387,6 +465,19 @@
     .dashboard-main-grid {
         grid-template-columns: 1fr;
     }
+
+    .admin-stats-grid {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns for tablets to fit report stats */
+        gap: 1.25rem;
+    }
+
+    .admin-page-content {
+        padding: 1.5rem;
+    }
+
+    .manage-header {
+        margin-bottom: 1.5rem;
+    }
 }
 
 @media (max-width: 768px) {
@@ -396,12 +487,28 @@
     }
     
     .admin-stats-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
         gap: 1rem;
+        overflow-x: auto; /* Allow scrolling if 3 columns get too tight */
+        padding-bottom: 0.5rem;
     }
 
     .stat-card-glass {
+        min-width: 180px; /* Ensure cards don't get too squished */
+    }
+
+    .stat-card-premium {
         padding: 1.25rem;
+    }
+
+    .stat-card-value {
+        font-size: 1.5rem;
+    }
+
+    .stat-card-icon-wrap {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
     }
 
     .chart-container {
@@ -409,22 +516,137 @@
         gap: 8px;
     }
 
+    .chart-bar-group {
+        min-width: 45px;
+    }
+
     .bar-label {
         font-size: 0.65rem;
     }
 }
 
+@media (max-width: 500px) {
+    .admin-stats-grid {
+        grid-template-columns: 1fr; /* Stack vertically for portrait to maintain value readability */
+        gap: 1rem;
+    }
+
+    .stat-card-glass {
+        min-height: 100px;
+        padding: 1.25rem;
+    }
+
+    .stat-card-glass .value {
+        font-size: 1.35rem;
+    }
+}
+
 @media (max-width: 480px) {
-    .admin-banner-premium {
+    .admin-dashboard,
+    .admin-page-content {
+        padding: 1.25rem 1rem;
+    }
+
+    .manage-header {
+        flex-direction: column;
+        align-items: center;
         text-align: center;
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .manage-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .admin-banner-premium {
+        padding: 1.5rem 1rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
     }
     
     .admin-banner-premium::after {
         display: none;
     }
 
+    .analytics-card, 
+    .system-status-card {
+        padding: 1.25rem 1rem;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .card-header h3 {
+        font-size: 1.1rem;
+        word-break: break-word;
+    }
+
+    .chart-container {
+        width: 100%;
+        margin: 0;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .chart-bar-group {
+        min-width: 40px; /* Slightly narrower to fit more on screen or scroll better */
+    }
+
+    .activity-list {
+        gap: 1rem;
+    }
+
+    .activity-info .activity-text {
+        font-size: 0.85rem;
+    }
+
+    .stat-card-premium {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .stat-card-info {
+        gap: 0.25rem;
+    }
+
+    .stat-card-value {
+        font-size: 1.15rem;
+    }
+
+    .chart-container {
+        height: 220px;
+        padding-top: 20px;
+    }
+
     .status-grid {
         grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .system-status-card {
+        margin-top: 1rem;
+    }
+    
+    .header-actions {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .header-actions button {
+        width: 100%;
+        justify-content: center;
     }
 }
 
