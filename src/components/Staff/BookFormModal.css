@@ -5,6 +5,7 @@
     right: 0;
     bottom: 0;
     background: rgba(15, 23, 42, 0.4);
+    -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     display: flex;
     align-items: center;
@@ -22,8 +23,8 @@
 }
 
 @keyframes fadeInOverlay {
-    from { opacity: 0; backdrop-filter: blur(0); }
-    to { opacity: 1; backdrop-filter: blur(12px); }
+    from { opacity: 0; -webkit-backdrop-filter: blur(0); backdrop-filter: blur(0); }
+    to { opacity: 1; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 }
 
 .book-modal {

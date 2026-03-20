@@ -26,6 +26,7 @@
 .staff-top-nav {
     height: var(--top-nav-height);
     background: rgba(255, 255, 255, 0.85);
+    -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     display: flex;
     align-items: center;

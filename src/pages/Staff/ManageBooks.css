@@ -126,6 +126,7 @@
     grid-template-columns: 2fr 1fr 1fr 1fr 1fr 160px;
     padding: 20px 32px;
     background: rgba(248, 250, 252, 0.5);
+    -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     font-size: 0.725rem;
     font-weight: 800;

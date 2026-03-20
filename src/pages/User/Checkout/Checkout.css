@@ -15,8 +15,8 @@
 /* Glass Premium Style */
 .glass-premium {
     background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.5);
     box-shadow:
         0 10px 30px -5px rgba(0, 0, 0, 0.05),
@@ -192,6 +192,7 @@
     border-radius: 32px;
     overflow: hidden;
     background: rgba(255, 255, 255, 0.6);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border: 1.5px solid rgba(255, 255, 255, 0.8);
     box-shadow:
@@ -289,6 +290,7 @@
 /* TOTAL FOOTER */
 .summary-total-footer {
     background: rgba(255, 255, 255, 0.8);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 20px;
@@ -395,6 +397,7 @@
     right: 0;
     bottom: 0;
     background: rgba(15, 23, 42, 0.7);
+    -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
